@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stopwatch & Timer | NOVEX</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#070914;color:white;font-family:Arial,sans-serif;min-height:100vh}
+header{padding:22px 7%;display:flex;justify-content:space-between;border-bottom:1px solid #252943}
+.logo{color:white;text-decoration:none;font-size:25px;font-weight:900;letter-spacing:3px}
+.logo span{color:#00d9ff}
+.back{color:#00d9ff;text-decoration:none}
+.hero{text-align:center;padding:45px 15px;background:radial-gradient(circle at top,#29205c,transparent 75%)}
+.hero small{color:#00d9ff;letter-spacing:4px}
+h1{font-size:clamp(32px,7vw,52px);margin:18px 0}
+h1 span{color:#00d9ff}
+.hero p{color:#a0a8c0}
+.workspace{width:min(600px,92%);margin:30px auto 80px;padding:25px;background:#11172b;border:1px solid #292e50;border-radius:18px}
+.tabs{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+button{padding:14px;border:1px solid #343b5c;border-radius:9px;background:#20264b;color:white;font-weight:bold;cursor:pointer}
+button.active{background:linear-gradient(100deg,#7165ff,#168dff);border:0}
+.panel{display:none;text-align:center;padding-top:30px}
+.panel.show{display:block}
+.clock{font-size:clamp(42px,10vw,65px);font-weight:800;color:#00d9ff;font-variant-numeric:tabular-nums;margin:25px 0}
+.actions{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.actions button{margin-top:10px}
+input{width:100%;padding:15px;background:#080d1b;color:white;border:1px solid #343b5c;border-radius:9px;margin:8px 0}
+#timerStatus{color:#00d9ff;margin-top:15px;font-size:13px}
+footer{text-align:center;padding:25px;color:#9299b5;border-top:1px solid #252943;font-size:12px}
+</style>
+</head>
+<body>
+<header>
+<a href="index.html" class="logo">NOVEX<span>.</span></a>
+<a href="tools.html" class="back">← Digital Tools</a>
+</header>
+
+<section class="hero">
+<small>NOVEX DIGITAL WORKSPACE</small>
+<h1>TIME <span>CONTROL.</span></h1>
+<p>Measure time and manage your countdowns.</p>
+</section>
+
+<main class="workspace">
+<div class="tabs">
+<button id="stopTab" class="active" onclick="showPanel('stop')">STOPWATCH</button>
+<button id="timerTab" onclick="showPanel('timer')">COUNTDOWN TIMER</button>
+</div>
+
+<section id="stopPanel" class="panel show">
+<div class="clock" id="stopDisplay">00:00.00</div>
+<div class="actions">
+<button onclick="startStopwatch()">START</button>
+<button onclick="pauseStopwatch()">PAUSE</button>
+<button onclick="resetStopwatch()">RESET</button>
+<button onclick="lapStopwatch()">LAP</button>
+</div>
+<div id="laps" style="margin-top:20px;text-align:left;color:#a0a8c0;line-height:2"></div>
+</section>
+
+<section id="timerPanel" class="panel">
+<input id="minutes" type="number" min="0" max="999" placeholder="Minutes">
+<input id="seconds" type="number" min="0" max="59" placeholder="Seconds">
+<div class="clock" id="timerDisplay">00:00</div>
+<div class="actions">
+<button onclick="startTimer()">START</button>
+<button onclick="pauseTimer()">PAUSE</button>
+<button onclick="resetTimer()">RESET</button>
+</div>
+<div id="timerStatus">Set a duration and start your timer.</div>
+</section>
+</main>
+
+<footer>NOVEX TIME CONTROL · © 2026 NOVEX</footer>
+
+<script>
+let swElapsed=0,swStart=0,swRunning=false,swFrame=null;
+let laps=0,timerEnd=0,timerRemaining=0,timerRunning=false,timerInterval=null;
+
+function showPanel(name){
+ document.getElementById("stopPanel").classList.toggle("show",name==="stop");
+ document.getElementById("timerPanel").classList.toggle("show",name==="timer");
+ document.getElementById("stopTab").classList.toggle("active",name==="stop");
+ document.getElementById("timerTab").classList.toggle("active",name==="timer");
+}
+
+function formatStop(ms){
+ const cent=Math.floor(ms/10)%100;
+ const sec=Math.floor(ms/1000)%60;
+ const min=Math.floor(ms/60000);
+ return String(min).padStart(2,"0")+":"+String(sec).padStart(2,"0")+"."+String(cent).padStart(2,"0");
+}
+
+function updateStop(){
+ if(!swRunning)return;
+ document.getElementById("stopDisplay").textContent=formatStop(swElapsed+performance.now()-swStart);
+ swFrame=requestAnimationFrame(updateStop);
+}
+function startStopwatch(){
+ if(swRunning)return;
+ swRunning=true;swStart=performance.now();
+ updateStop();
+}
+function pauseStopwatch(){
+ if(!swRunning)return;
+ swElapsed+=performance.now()-swStart;
+ swRunning=false;cancelAnimationFrame(swFrame);
+ document.getElementById("stopDisplay").textContent=formatStop(swElapsed);
+}
+function resetStopwatch(){
+ pauseStopwatch();swElapsed=0;laps=0;
+ document.getElementById("stopDisplay").textContent="00:00.00";
+ document.getElementById("laps").textContent="";
+}
+function lapStopwatch(){
+ if(!swRunning)return;
+ laps++;
+ const time=formatStop(swElapsed+performance.now()-swStart);
+ const row=document.createElement("div");
+ row.textContent="Lap "+laps+" — "+time;
+ document.getElementById("laps").prepend(row);
+}
+
+function formatTimer(seconds){
+ return String(Math.floor(seconds/60)).padStart(2,"0")+":"+String(seconds%60).padStart(2,"0");
+}
+function renderTimer(){
+ const left=Math.max(0,Math.ceil((timerEnd-Date.now())/1000));
+ timerRemaining=left;
+ document.getElementById("timerDisplay").textContent=formatTimer(left);
+ if(left<=0){
+  pauseTimer();
+  document.getElementById("timerStatus").textContent="Time is up!";
+  alert("NOVEX timer: Time is up!");
+ }
+}
+function startTimer(){
+ if(timerRunning)return;
+ if(timerRemaining<=0){
+  const m=Number(document.getElementById("minutes").value)||0;
+  const s=Number(document.getElementById("seconds").value)||0;
+  if(m<0||s<0||s>59||m+s===0){
+   document.getElementById("timerStatus").textContent="Enter a valid duration.";
+   return;
+  }
+  timerRemaining=m*60+s;
+ }
+ timerEnd=Date.now()+timerRemaining*1000;
+ timerRunning=true;
+ document.getElementById("timerStatus").textContent="Timer running.";
+ renderTimer();
+ timerInterval=setInterval(renderTimer,200);
+}
+function pauseTimer(){
+ if(timerRunning){
+  timerRemaining=Math.max(0,Math.ceil((timerEnd-Date.now())/1000));
+  clearInterval(timerInterval);
+  timerRunning=false;
+ }
+}
+function resetTimer(){
+ pauseTimer();timerRemaining=0;
+ document.getElementById("timerDisplay").textContent="00:00";
+ document.getElementById("timerStatus").textContent="Timer reset.";
+}
+</script>
+</body>
+</html>
