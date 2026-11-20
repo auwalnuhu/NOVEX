@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Image Compressor | NOVEX</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#070914;color:white;font-family:Arial,sans-serif;min-height:100vh}
+header{padding:22px 7%;display:flex;justify-content:space-between;border-bottom:1px solid #252943}
+.logo{color:white;text-decoration:none;font-size:25px;font-weight:900;letter-spacing:3px}
+.logo span{color:#00d9ff}
+.back{color:#00d9ff;text-decoration:none}
+.hero{text-align:center;padding:50px 15px;background:radial-gradient(circle at top,#29205c,transparent 75%)}
+.hero small{color:#00d9ff;letter-spacing:4px}
+h1{font-size:clamp(32px,7vw,55px);margin:18px 0}
+h1 span{color:#00d9ff}
+.hero p{color:#a0a8c0}
+.workspace{width:min(600px,90%);margin:30px auto 80px;padding:25px;background:#11172b;border:1px solid #292e50;border-radius:18px}
+.upload{display:block;text-align:center;padding:35px 15px;border:2px dashed #555b85;border-radius:12px;cursor:pointer;color:#00d9ff}
+.upload input{display:none}
+.preview{text-align:center;margin-top:20px}
+.preview img{max-width:100%;max-height:280px;border-radius:10px;display:none;margin:auto}
+label.control{display:block;margin:20px 0 10px;color:#c6cbe0;font-size:13px}
+input[type=range]{width:100%;accent-color:#00d9ff}
+.quality{display:flex;justify-content:space-between;margin:18px 0 10px;color:#c6cbe0}
+button,.download{display:block;width:100%;padding:15px;margin-top:18px;background:linear-gradient(100deg,#7165ff,#168dff);color:white;border:0;border-radius:9px;font-weight:bold;text-align:center;text-decoration:none;cursor:pointer}
+.download{display:none;background:#17213c;color:#00d9ff;border:1px solid #343b5c}
+.info{text-align:center;color:#00d9ff;margin-top:18px;font-size:13px;line-height:1.6}
+footer{text-align:center;padding:25px;color:#9299b5;border-top:1px solid #252943;font-size:12px}
+</style>
+</head>
+<body>
+<header>
+<a href="index.html" class="logo">NOVEX<span>.</span></a>
+<a href="tools.html" class="back">← Digital Tools</a>
+</header>
+<section class="hero">
+<small>NOVEX DIGITAL WORKSPACE</small>
+<h1>IMAGE <span>COMPRESSOR.</span></h1>
+<p>Reduce image file size directly in your browser.</p>
+</section>
+<main class="workspace">
+<label class="upload">
+<input type="file" id="file" accept="image/*">
+<span>📁 Choose an Image</span>
+<p style="color:#9299b5;margin-top:10px;font-size:12px">Select an image from your device</p>
+</label>
+
+<div class="preview">
+<img id="preview" alt="Image preview">
+</div>
+
+<div class="quality">
+<span>Compression Quality</span>
+<strong id="qualityValue">70%</strong>
+</div>
+<input type="range" id="quality" min="10" max="100" value="70">
+
+<button onclick="compressImage()">COMPRESS IMAGE</button>
+<a id="download" class="download" download="NOVEX-compressed.jpg">DOWNLOAD COMPRESSED IMAGE</a>
+<div class="info" id="info">Your selected image will be processed on your device.</div>
+</main>
+<footer>NOVEX IMAGE COMPRESSOR · © 2026 NOVEX</footer>
+
+<script>
+let selectedImage=null;
+let originalSize=0;
+
+const fileInput=document.getElementById("file");
+const preview=document.getElementById("preview");
+const quality=document.getElementById("quality");
+const info=document.getElementById("info");
+const download=document.getElementById("download");
+
+quality.addEventListener("input",()=>{
+ document.getElementById("qualityValue").textContent=quality.value+"%";
+});
+
+fileInput.addEventListener("change",()=>{
+ const file=fileInput.files[0];
+ if(!file)return;
+
+ if(!file.type.startsWith("image/")){
+  info.textContent="Please select a valid image.";
+  return;
+ }
+
+ if(file.size>25*1024*1024){
+  info.textContent="Image is too large. Choose an image below 25 MB.";
+  fileInput.value="";
+  return;
+ }
+
+ originalSize=file.size;
+ selectedImage=new Image();
+
+ const reader=new FileReader();
+ reader.onload=event=>{
+  selectedImage.onload=()=>{
+   preview.src=event.target.result;
+   preview.style.display="block";
+   download.style.display="none";
+   info.textContent="Image loaded: "+formatSize(originalSize);
+  };
+  selectedImage.src=event.target.result;
+ };
+ reader.readAsDataURL(file);
+});
+
+function formatSize(bytes){
+ return bytes<1024*1024?
+ (bytes/1024).toFixed(1)+" KB":
+ (bytes/(1024*1024)).toFixed(2)+" MB";
+}
+
+function compressImage(){
+ if(!selectedImage){
+  info.textContent="Please choose an image first.";
+  return;
+ }
+
+ const canvas=document.createElement("canvas");
+ canvas.width=selectedImage.naturalWidth;
+ canvas.height=selectedImage.naturalHeight;
+
+ const ctx=canvas.getContext("2d");
+ ctx.drawImage(selectedImage,0,0);
+
+ canvas.toBlob(blob=>{
+  if(!blob){
+   info.textContent="Compression failed. Try another image.";
+   return;
+  }
+
+  const url=URL.createObjectURL(blob);
+  download.href=url;
+  download.style.display="block";
+
+  const difference=(1-blob.size/originalSize)*100;
+  info.textContent="Original: "+formatSize(originalSize)+
+  " | Compressed: "+formatSize(blob.size)+
+  " | Size change: "+difference.toFixed(1)+"%";
+
+ }, "image/jpeg", Number(quality.value)/100);
+}
+</script>
+</body>
+</html>
