@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calculator | NOVEX</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#070914;color:white;font-family:Arial,sans-serif;min-height:100vh}
+header{padding:22px 7%;display:flex;justify-content:space-between;border-bottom:1px solid #252943}
+.logo{color:white;text-decoration:none;font-size:25px;font-weight:900;letter-spacing:3px}
+.logo span{color:#00d9ff}
+.back{color:#00d9ff;text-decoration:none}
+.hero{text-align:center;padding:45px 15px;background:radial-gradient(circle at top,#29205c,transparent 75%)}
+.hero small{color:#00d9ff;letter-spacing:4px}
+h1{font-size:45px;margin:18px 0}
+h1 span{color:#00d9ff}
+.calculator{width:min(380px,90%);margin:25px auto 70px;background:#11172b;padding:22px;border:1px solid #292e50;border-radius:18px;box-shadow:0 20px 60px #0008}
+#display{width:100%;height:85px;background:#080d1b;border:1px solid #343b5c;border-radius:10px;color:#00d9ff;text-align:right;font-size:32px;padding:15px;margin-bottom:17px}
+.keys{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+button{height:62px;border:1px solid #343b5c;border-radius:10px;background:#19213b;color:white;font-size:20px;font-weight:bold;cursor:pointer}
+button:active{transform:scale(.94)}
+.operator{color:#00d9ff;background:#20264b}
+.clear{color:#ff8292}
+.equal{background:linear-gradient(120deg,#7165ff,#168dff);grid-column:span 2}
+footer{text-align:center;padding:25px;color:#9299b5;font-size:12px;border-top:1px solid #252943}
+</style>
+</head>
+<body>
+<header>
+<a href="index.html" class="logo">NOVEX<span>.</span></a>
+<a href="tools.html" class="back">← Digital Tools</a>
+</header>
+<section class="hero">
+<small>NOVEX DIGITAL WORKSPACE</small>
+<h1>SMART <span>CALCULATOR.</span></h1>
+<p>Simple calculations, fast results.</p>
+</section>
+<main class="calculator">
+<input id="display" value="0" readonly aria-label="Calculator display">
+<div class="keys">
+<button class="clear" onclick="clearDisplay()">AC</button>
+<button onclick="deleteLast()">DEL</button>
+<button class="operator" onclick="add('/')">÷</button>
+<button class="operator" onclick="add('*')">×</button>
+<button onclick="add('7')">7</button>
+<button onclick="add('8')">8</button>
+<button onclick="add('9')">9</button>
+<button class="operator" onclick="add('-')">−</button>
+<button onclick="add('4')">4</button>
+<button onclick="add('5')">5</button>
+<button onclick="add('6')">6</button>
+<button class="operator" onclick="add('+')">+</button>
+<button onclick="add('1')">1</button>
+<button onclick="add('2')">2</button>
+<button onclick="add('3')">3</button>
+<button onclick="add('.')">.</button>
+<button onclick="add('0')">0</button>
+<button onclick="add('00')">00</button>
+<button class="equal" onclick="calculate()">=</button>
+</div>
+</main>
+<footer>NOVEX SMART CALCULATOR · © 2026 NOVEX</footer>
+<script>
+const display=document.getElementById("display");
+function add(value){
+ if(display.value==="Error")display.value="0";
+ if(display.value==="0" && ![".","+","-","*","/"].includes(value))display.value=value;
+ else display.value+=value;
+}
+function clearDisplay(){display.value="0"}
+function deleteLast(){
+ display.value=display.value.length>1?display.value.slice(0,-1):"0";
+}
+function calculate(){
+ try{
+  const expression=display.value;
+  if(!/^[0-9+\-*/.() ]+$/.test(expression))throw Error();
+  const result=Function('"use strict";return ('+expression+')')();
+  if(!Number.isFinite(result))throw Error();
+  display.value=String(Number(result.toPrecision(12)));
+ }catch(error){display.value="Error"}
+}
+</script>
+</body>
+</html>
