@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NOVEX | QR Customizer</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Arial,sans-serif;background:#080d1c;color:#fff;padding:22px}
+.container{max-width:850px;margin:auto}
+header{display:flex;justify-content:space-between;align-items:center;margin-bottom:40px}
+.logo{font-size:25px;font-weight:900;color:#35d9ff}
+a{color:#35d9ff;text-decoration:none}
+.hero{text-align:center;margin-bottom:28px}
+.hero h1{font-size:32px;margin-bottom:10px}
+.hero p{color:#aab5ca;line-height:1.6}
+.panel{background:#111a30;border:1px solid #263957;border-radius:18px;padding:24px}
+label{display:block;color:#b9c8dc;margin:17px 0 8px;font-size:14px}
+input,select{width:100%;padding:14px;border:1px solid #304363;background:#080f20;color:white;border-radius:9px;font-size:15px}
+.colors{display:grid;grid-template-columns:1fr 1fr;gap:15px}
+input[type=color]{height:50px;padding:5px;cursor:pointer}
+button{border:0;border-radius:9px;padding:15px;font-size:15px;font-weight:bold;cursor:pointer}
+.generate{width:100%;margin-top:22px;background:linear-gradient(90deg,#087eae,#6247d8);color:white}
+.preview{margin-top:25px;background:#081426;border:1px solid #24415f;border-radius:14px;padding:25px;text-align:center}
+.preview img{width:230px;max-width:100%;background:white;padding:10px;border-radius:8px;display:none;margin:15px auto}
+.preview p{color:#aab5ca;font-size:13px}
+.download{display:none;background:#35d9ff;color:#06101c;margin-top:15px;width:100%}
+#status{margin-top:15px;color:#aab5ca;font-size:13px;line-height:1.5}
+footer{text-align:center;color:#72819b;margin-top:30px;font-size:13px}
+@media(max-width:500px){.panel{padding:17px}.hero h1{font-size:27px}}
+</style>
+</head>
+<body>
+<div class="container">
+<header>
+<div class="logo">NOVEX.</div>
+<a href="tools.html">← All Tools</a>
+</header>
+
+<section class="hero">
+<h1>QR Code Customizer</h1>
+<p>Create colourful QR codes and download your design.</p>
+</section>
+
+<main class="panel">
+<label for="content">Website or text</label>
+<input id="content" type="text" placeholder="https://example.com">
+
+<div class="colors">
+<div>
+<label for="foreground">QR Colour</label>
+<input type="color" id="foreground" value="#111827">
+</div>
+<div>
+<label for="background">Background Colour</label>
+<input type="color" id="background" value="#ffffff">
+</div>
+</div>
+
+<label for="size">QR Code Size</label>
+<select id="size">
+<option value="200">Small — 200px</option>
+<option value="300" selected>Medium — 300px</option>
+<option value="500">Large — 500px</option>
+<option value="700">Extra Large — 700px</option>
+</select>
+
+<button class="generate" id="generate">Generate Custom QR</button>
+
+<div class="preview">
+<h3>Your QR Design</h3>
+<img id="qrImage" alt="Generated custom QR code">
+<p id="status">Your QR code will appear here.</p>
+<button class="download" id="download">Download QR Code</button>
+</div>
+</main>
+
+<footer>© 2026 NOVEX — Your Digital Universe</footer>
+</div>
+
+<script>
+const content=document.getElementById("content");
+const foreground=document.getElementById("foreground");
+const background=document.getElementById("background");
+const size=document.getElementById("size");
+const image=document.getElementById("qrImage");
+const status=document.getElementById("status");
+const download=document.getElementById("download");
+
+let currentUrl="";
+
+document.getElementById("generate").addEventListener("click",()=>{
+const value=content.value.trim();
+
+if(!value){
+status.textContent="Please enter a website or text first.";
+return;
+}
+
+const fg=foreground.value.replace("#","");
+const bg=background.value.replace("#","");
+
+if(fg.toLowerCase()===bg.toLowerCase()){
+status.textContent="Choose different QR and background colours.";
+return;
+}
+
+const params=new URLSearchParams({
+size:size.value+"x"+size.value,
+data:value,
+color:fg,
+bgcolor:bg,
+format:"png"
+});
+
+currentUrl="https://api.qrserver.com/v1/create-qr-code/?"+params.toString();
+
+image.style.display="none";
+download.style.display="none";
+status.textContent="Generating your QR code...";
+
+const testImage=new Image();
+
+testImage.onload=()=>{
+image.src=currentUrl;
+image.style.display="block";
+download.style.display="block";
+status.textContent="Your custom QR code is ready!";
+};
+
+testImage.onerror=()=>{
+status.textContent="Could not generate QR code. Check your internet connection.";
+};
+
+testImage.src=currentUrl;
+});
+
+download.addEventListener("click",async()=>{
+if(!currentUrl)return;
+
+try{
+const response=await fetch(currentUrl);
+if(!response.ok)throw new Error("Download failed");
+
+const blob=await response.blob();
+const url=URL.createObjectURL(blob);
+const link=document.createElement("a");
+
+link.href=url;
+link.download="NOVEX-Custom-QR.png";
+link.click();
+
+URL.revokeObjectURL(url);
+}catch{
+status.textContent="Download failed. Try again or save the displayed image.";
+}
+});
+</script>
+</body>
+</html>
