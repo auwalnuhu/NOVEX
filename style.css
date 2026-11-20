@@ -1010,3 +1010,89 @@ a {
         min-height: 250px;
     }
 }
+
+/* ======================================
+   NOVEX — GLOBAL PAGE POLISH
+====================================== */
+
+body {
+    background-color: #070914;
+    color: #ffffff;
+}
+
+.hero {
+    position: relative;
+    overflow: hidden;
+}
+
+.hero::before {
+    content: "";
+    position: absolute;
+    width: 350px;
+    height: 350px;
+    border-radius: 50%;
+    background: rgba(113,101,255,0.09);
+    filter: blur(100px);
+    top: 10%;
+    right: -100px;
+    pointer-events: none;
+}
+
+.hero-content {
+    position: relative;
+    z-index: 1;
+}
+
+.section-heading h2 {
+    letter-spacing: -1px;
+}
+
+.feature-card {
+    backdrop-filter: blur(15px);
+}
+
+footer {
+    background: rgba(5,7,17,0.7);
+}
+
+footer .logo {
+    color: #ffffff;
+}
+
+footer p {
+    line-height: 1.8;
+}
+
+/* Page transitions */
+
+@keyframes novexEntrance {
+    from {
+        opacity: 0;
+        transform: translateY(18px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+main {
+    animation: novexEntrance 0.7s ease both;
+}
+
+/* Mobile refinements */
+
+@media (max-width: 600px) {
+    .section-heading {
+        padding: 0 5px;
+    }
+
+    .section-heading h2 {
+        font-size: 30px;
+    }
+
+    .about h2 {
+        letter-spacing: -1px;
+    }
+}
