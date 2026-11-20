@@ -234,6 +234,45 @@ a{color:inherit;text-decoration:none}
 <script src="supabase-config.js"></script>
 
 <script>
+  const authClient = window.supabaseClient;
+
+async function protectDashboard() {
+    if (!authClient) {
+        location.href = "auth.html";
+        return;
+    }
+
+    const { data, error } = await authClient.auth.getUser();
+
+    if (error || !data.user) {
+        location.href = "auth.html";
+        return;
+    }
+
+    const user = data.user;
+    const name = user.user_metadata?.full_name ||
+                 user.email?.split("@")[0] ||
+                 "NOVEX User";
+
+    document.getElementById("userProfile").textContent =
+        name.charAt(0).toUpperCase();
+
+    document.querySelector(".welcome h1").textContent =
+        "Welcome, " + name + ".";
+
+    document.getElementById("logoutButton").addEventListener("click", async () => {
+        const { error } = await authClient.auth.signOut();
+
+        if (error) {
+            alert("Logout failed. Please try again.");
+            return;
+        }
+
+        location.href = "auth.html";
+    });
+}
+
+protectDashboard();
 const clock=document.getElementById("clock");
 const today=document.getElementById("today");
 
