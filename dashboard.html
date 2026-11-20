@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NOVEX | Command Center</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#080d1c;--panel:#111a30;--border:#263957;--cyan:#35d9ff;--muted:#9baac1}
+body{font-family:Arial,sans-serif;background:var(--bg);color:white;min-height:100vh}
+button,input,textarea{font:inherit}
+a{color:inherit;text-decoration:none}
+.layout{display:flex;min-height:100vh}
+.sidebar{width:245px;background:#0c1427;border-right:1px solid var(--border);padding:25px 18px;position:fixed;inset:0 auto 0 0;z-index:5}
+.logo{font-size:27px;font-weight:900;color:var(--cyan);padding:5px 10px 30px}
+.logo span{color:white}
+.side-label{font-size:10px;color:#657590;letter-spacing:2px;margin:18px 10px 10px}
+.nav a{display:flex;gap:12px;align-items:center;padding:13px 12px;border-radius:10px;color:#aebbd0;margin-bottom:5px;font-size:14px}
+.nav a:hover,.nav a.active{background:#142b46;color:var(--cyan)}
+.sidebar-bottom{position:absolute;bottom:25px;left:25px;color:#70819c;font-size:12px}
+.main{margin-left:245px;width:calc(100% - 245px);padding:28px 35px 50px}
+.topbar{display:flex;justify-content:space-between;align-items:center;gap:15px;margin-bottom:35px}
+.topbar p{font-size:13px;color:var(--muted);margin-top:5px}
+.top-actions{display:flex;align-items:center;gap:12px}
+.profile{width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,#087eae,#7049db);display:grid;place-items:center;font-weight:bold}
+.icon-button{background:var(--panel);border:1px solid var(--border);color:white;padding:11px 14px;border-radius:10px}
+.welcome{background:linear-gradient(115deg,#102c4a,#292052);border:1px solid #34527a;border-radius:20px;padding:30px;margin-bottom:25px;position:relative;overflow:hidden}
+.welcome:after{content:"✦";position:absolute;right:40px;top:0;font-size:150px;color:#ffffff0b}
+.welcome small{color:var(--cyan);letter-spacing:2px;font-weight:bold}
+.welcome h1{font-size:32px;margin:12px 0}
+.welcome p{color:#c0cce0;line-height:1.6;max-width:550px;font-size:14px}
+.clock{font-size:25px;font-weight:bold;margin-top:20px;color:var(--cyan)}
+.section-heading{display:flex;justify-content:space-between;align-items:center;margin:28px 0 15px}
+.section-heading h2{font-size:19px}
+.section-heading span{font-size:12px;color:var(--muted)}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:15px}
+.stat,.panel,.app-card{background:var(--panel);border:1px solid var(--border);border-radius:15px}
+.stat{padding:19px}
+.stat .symbol{font-size:23px}
+.stat h3{font-size:27px;margin:12px 0 5px}
+.stat p{font-size:12px;color:var(--muted)}
+.app-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:13px}
+.app-card{padding:19px 14px;transition:.2s}
+.app-card:hover{border-color:var(--cyan);transform:translateY(-3px)}
+.app-icon{font-size:27px;margin-bottom:14px}
+.app-card h3{font-size:14px;margin-bottom:6px}
+.app-card p{font-size:11px;color:var(--muted);line-height:1.5}
+.workspace{display:grid;grid-template-columns:1.15fr .85fr;gap:16px}
+.panel{padding:20px}
+.panel h3{font-size:16px;margin-bottom:15px}
+.task-form{display:flex;gap:8px;margin-bottom:15px}
+.task-form input,.note-area{background:#080f20;color:white;border:1px solid #304363;border-radius:9px;padding:12px;outline:none;width:100%;min-width:0}
+.task-form input:focus,.note-area:focus{border-color:var(--cyan)}
+.primary{background:linear-gradient(90deg,#087eae,#6247d8);color:white;border:0;border-radius:9px;padding:12px 16px;font-weight:bold;cursor:pointer}
+.task-list{list-style:none}
+.task-list li{display:flex;align-items:center;gap:10px;padding:12px 0;border-bottom:1px solid #25334b;font-size:13px}
+.task-list li span{flex:1;overflow-wrap:anywhere}
+.task-list li.done span{text-decoration:line-through;color:#71829c}
+.task-list input{accent-color:#35d9ff}
+.delete{background:none;border:0;color:#ff7384;font-size:18px;cursor:pointer}
+.note-area{height:180px;resize:vertical;line-height:1.6}
+.note-status{font-size:11px;color:var(--muted);margin-top:10px}
+.search-box{width:100%;background:#111a30;border:1px solid var(--border);border-radius:11px;padding:14px 16px;color:white;outline:none;margin-bottom:5px}
+.search-box:focus{border-color:var(--cyan)}
+.footer{text-align:center;color:#61718b;font-size:12px;margin-top:35px}
+.mobile-menu{display:none}
+@media(max-width:1000px){.app-grid{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:700px){
+.sidebar{width:72px;padding:20px 9px}
+.logo{font-size:17px;padding:5px 5px 30px}
+.logo span,.nav a .nav-text,.side-label,.sidebar-bottom{display:none}
+.nav a{justify-content:center;font-size:20px;padding:14px 5px}
+.main{margin-left:72px;width:calc(100% - 72px);padding:20px 15px}
+.app-grid{grid-template-columns:repeat(2,1fr)}
+.stats{grid-template-columns:1fr}
+.workspace{grid-template-columns:1fr}
+.welcome{padding:23px}
+.welcome h1{font-size:25px}
+.topbar h2{font-size:19px}
+}
+@media(max-width:380px){.app-grid{grid-template-columns:1fr 1fr}.main{padding:15px 10px}}
+</style>
+</head>
+<body>
+<div class="layout">
+
+<aside class="sidebar">
+<div class="logo">N<span>OVEX</span>.</div>
+
+<div class="side-label">WORKSPACE</div>
+<nav class="nav">
+<a class="active" href="dashboard.html">⌂ <span class="nav-text">Dashboard</span></a>
+<a href="index.html">⌘ <span class="nav-text">Home</span></a>
+<a href="ai.html">✧ <span class="nav-text">AI Hub</span></a>
+<a href="tools.html">▦ <span class="nav-text">Applications</span></a>
+<a href="notes.html">▤ <span class="nav-text">Notes</span></a>
+</nav>
+
+<div class="side-label">DISCOVER</div>
+<nav class="nav">
+<a href="about.html">ⓘ <span class="nav-text">About NOVEX</span></a>
+<a href="contact.html">✉ <span class="nav-text">Contact</span></a>
+</nav>
+
+<div class="sidebar-bottom">NOVEX OS · 2026</div>
+</aside>
+
+<main class="main">
+
+<header class="topbar">
+<div>
+<h2>Command Center</h2>
+<p>Your digital world, under one roof.</p>
+</div>
+<div class="top-actions">
+<button class="icon-button" onclick="location.href='tools.html'">＋ Apps</button>
+<div class="profile">N</div>
+</div>
+</header>
+
+<section class="welcome">
+<small>NOVEX COMMAND CENTER</small>
+<h1>Welcome to your universe.</h1>
+<p>Everything you need to work, create, explore and stay productive. Your digital workspace starts here.</p>
+<div class="clock" id="clock">00:00:00</div>
+<p id="today"></p>
+</section>
+
+<div class="section-heading">
+<h2>Workspace Overview</h2>
+<span>Your personal control centre</span>
+</div>
+
+<section class="stats">
+<div class="stat">
+<div class="symbol">🚀</div>
+<h3>15+</h3>
+<p>Available NOVEX tools and pages</p>
+</div>
+<div class="stat">
+<div class="symbol">☑️</div>
+<h3 id="taskCount">0</h3>
+<p>Tasks completed</p>
+</div>
+<div class="stat">
+<div class="symbol">📝</div>
+<h3 id="noteCount">0</h3>
+<p>Characters in your quick notes</p>
+</div>
+</section>
+
+<div class="section-heading">
+<h2>Application Launcher</h2>
+<span>Explore your NOVEX apps</span>
+</div>
+
+<input class="search-box" id="appSearch" placeholder="⌕ Search your applications...">
+
+<section class="app-grid" id="appGrid">
+<a class="app-card" href="ai.html" data-name="ai hub artificial intelligence">
+<div class="app-icon">🤖</div><h3>AI Hub</h3><p>Explore AI platforms.</p>
+</a>
+<a class="app-card" href="tools.html" data-name="digital tools applications">
+<div class="app-icon">🧰</div><h3>Digital Tools</h3><p>Your collection of utilities.</p>
+</a>
+<a class="app-card" href="notes.html" data-name="notes writing workspace">
+<div class="app-icon">📝</div><h3>Notes</h3><p>Write and save your ideas.</p>
+</a>
+<a class="app-card" href="calculator.html" data-name="calculator mathematics">
+<div class="app-icon">🧮</div><h3>Calculator</h3><p>Calculate with ease.</p>
+</a>
+<a class="app-card" href="qr-generator.html" data-name="qr code generator">
+<div class="app-icon">▦</div><h3>QR Generator</h3><p>Create QR codes.</p>
+</a>
+<a class="app-card" href="password-generator.html" data-name="password generator security">
+<div class="app-icon">🔐</div><h3>Password Generator</h3><p>Create secure passwords.</p>
+</a>
+<a class="app-card" href="image-compressor.html" data-name="image compressor photos">
+<div class="app-icon">🖼️</div><h3>Image Compressor</h3><p>Reduce image file sizes.</p>
+</a>
+<a class="app-card" href="unit-converter.html" data-name="unit converter measurements">
+<div class="app-icon">📐</div><h3>Unit Converter</h3><p>Convert measurements.</p>
+</a>
+<a class="app-card" href="currency-converter.html" data-name="currency converter money">
+<div class="app-icon">💱</div><h3>Currency Converter</h3><p>Convert global currencies.</p>
+</a>
+<a class="app-card" href="age-calculator.html" data-name="age calculator birthday">
+<div class="app-icon">🎂</div><h3>Age Calculator</h3><p>Calculate your exact age.</p>
+</a>
+<a class="app-card" href="stopwatch.html" data-name="stopwatch timer">
+<div class="app-icon">⏱️</div><h3>Stopwatch</h3><p>Track your time.</p>
+</a>
+<a class="app-card" href="qr-scanner.html" data-name="qr scanner scan">
+<div class="app-icon">📷</div><h3>QR Scanner</h3><p>Scan QR codes.</p>
+</a>
+<a class="app-card" href="text-tools.html" data-name="text tools utilities">
+<div class="app-icon">🔤</div><h3>Text Utilities</h3><p>Transform your text.</p>
+</a>
+<a class="app-card" href="qr-customizer.html" data-name="qr customizer design">
+<div class="app-icon">🎨</div><h3>QR Customizer</h3><p>Design colourful QR codes.</p>
+</a>
+<a class="app-card" href="contact.html" data-name="contact support">
+<div class="app-icon">✉️</div><h3>Support</h3><p>Get in touch with NOVEX.</p>
+</a>
+</section>
+
+<div class="section-heading">
+<h2>Personal Workspace</h2>
+<span>Your data stays in this browser</span>
+</div>
+
+<section class="workspace">
+<div class="panel">
+<h3>☑️ Task Manager</h3>
+<form class="task-form" id="taskForm">
+<input id="taskInput" placeholder="What needs to be done?" maxlength="120" required>
+<button class="primary" type="submit">Add</button>
+</form>
+<ul class="task-list" id="taskList"></ul>
+</div>
+
+<div class="panel">
+<h3>📝 Quick Notes</h3>
+<textarea class="note-area" id="quickNote" placeholder="Write down an idea, reminder or thought..."></textarea>
+<div class="note-status" id="noteStatus">Your notes save automatically on this device.</div>
+</div>
+</section>
+
+<footer class="footer">NOVEX — YOUR DIGITAL UNIVERSE · 2026</footer>
+</main>
+</div>
+
+<script>
+const clock=document.getElementById("clock");
+const today=document.getElementById("today");
+
+function updateClock(){
+const now=new Date();
+clock.textContent=now.toLocaleTimeString();
+today.textContent=now.toLocaleDateString(undefined,{
+weekday:"long",year:"numeric",month:"long",day:"numeric"
+});
+}
+updateClock();
+setInterval(updateClock,1000);
+
+// Application search
+document.getElementById("appSearch").addEventListener("input",function(){
+const query=this.value.toLowerCase();
+document.querySelectorAll(".app-card").forEach(card=>{
+card.style.display=card.dataset.name.includes(query)?"block":"none";
+});
+});
+
+// Tasks
+let tasks=[];
+try{tasks=JSON.parse(localStorage.getItem("novex_tasks")||"[]");}catch(e){tasks=[];}
+
+function saveTasks(){
+localStorage.setItem("novex_tasks",JSON.stringify(tasks));
+renderTasks();
+}
+
+function renderTasks(){
+const list=document.getElementById("taskList");
+list.innerHTML="";
+let completed=0;
+
+tasks.forEach((task,index)=>{
+if(task.done)completed++;
+
+const li=document.createElement("li");
+if(task.done)li.classList.add("done");
+
+const checkbox=document.createElement("input");
+checkbox.type="checkbox";
+checkbox.checked=task.done;
+checkbox.addEventListener("change",()=>{
+tasks[index].done=checkbox.checked;
+saveTasks();
+});
+
+const text=document.createElement("span");
+text.textContent=task.text;
+
+const remove=document.createElement("button");
+remove.className="delete";
+remove.textContent="×";
+remove.title="Delete task";
+remove.addEventListener("click",()=>{
+tasks.splice(index,1);
+saveTasks();
+});
+
+li.append(checkbox,text,remove);
+list.appendChild(li);
+});
+
+if(!tasks.length){
+const empty=document.createElement("li");
+empty.textContent="No tasks yet. Add your first task above.";
+empty.style.color="#8494ad";
+list.appendChild(empty);
+}
+
+document.getElementById("taskCount").textContent=completed;
+}
+
+document.getElementById("taskForm").addEventListener("submit",function(e){
+e.preventDefault();
+const input=document.getElementById("taskInput");
+const value=input.value.trim();
+if(!value)return;
+tasks.push({text:value,done:false});
+input.value="";
+saveTasks();
+});
+
+renderTasks();
+
+// Quick notes
+const quickNote=document.getElementById("quickNote");
+const noteStatus=document.getElementById("noteStatus");
+
+quickNote.value=localStorage.getItem("novex_quick_note")||"";
+
+function updateNoteCount(){
+document.getElementById("noteCount").textContent=quickNote.value.length;
+}
+updateNoteCount();
+
+quickNote.addEventListener("input",()=>{
+localStorage.setItem("novex_quick_note",quickNote.value);
+noteStatus.textContent="Saved on this device.";
+updateNoteCount();
+});
+</script>
+</body>
+</html>
