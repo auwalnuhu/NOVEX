@@ -1,36 +1,199 @@
-<section class="features" id="contact">
 
-    <div class="section-heading">
-        <span>OFFICIAL CONTACT</span>
-        <h2>Connect with NOVEX.</h2>
-        <p>Reach the founder directly.</p>
-    </div>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#070914">
 
-    <div class="feature-grid">
+    <title>Contact | NOVEX</title>
 
-        <article class="feature-card">
-            <div class="feature-icon">👤</div>
-            <h3>Founder</h3>
-            <p>Auwal Nuhu Musa</p>
-            <a href="about.html">About NOVEX ↗</a>
-        </article>
+    <link rel="stylesheet" href="style.css">
 
-        <article class="feature-card">
-            <div class="feature-icon">☎</div>
-            <h3>Phone Number</h3>
-            <p>09014860771</p>
-            <a href="tel:09014860771">Call Now ↗</a>
-        </article>
+    <style>
+        body {
+            background: #070914;
+            color: #ffffff;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            min-height: 100vh;
+        }
 
-        <article class="feature-card">
-            <div class="feature-icon">✉</div>
-            <h3>Email Address</h3>
-            <p>bingelbappa2024@gmail.com</p>
-            <a href="mailto:bingelbappa2024@gmail.com">
-                Send Email ↗
-            </a>
-        </article>
+        .contact-hero {
+            text-align: center;
+            padding: 90px 20px 45px;
+            background:
+                radial-gradient(circle at 50% 0%, #28205e, transparent 65%);
+        }
 
-    </div>
+        .contact-hero .eyebrow {
+            color: #00d9ff;
+            letter-spacing: 4px;
+            font-size: 12px;
+            font-weight: bold;
+        }
 
-</section>
+        .contact-hero h1 {
+            font-size: clamp(42px, 9vw, 75px);
+            margin: 22px 0;
+            font-weight: 900;
+        }
+
+        .contact-hero h1 span {
+            background: linear-gradient(90deg, #7165ff, #00d9ff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .contact-hero p {
+            color: #a8adc5;
+            max-width: 550px;
+            margin: auto;
+            line-height: 1.8;
+        }
+
+        .contact-container {
+            width: min(1000px, 88%);
+            margin: 40px auto 100px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 25px;
+        }
+
+        .contact-card {
+            padding: 35px 25px;
+            border: 1px solid rgba(0,217,255,0.2);
+            border-radius: 18px;
+            background: linear-gradient(145deg, #171c35, #0c1020);
+            box-shadow: 0 15px 45px rgba(0,0,0,0.3);
+            text-align: center;
+            transition: 0.3s;
+        }
+
+        .contact-card:hover {
+            transform: translateY(-8px);
+            border-color: #00d9ff;
+        }
+
+        .contact-icon {
+            width: 65px;
+            height: 65px;
+            display: grid;
+            place-items: center;
+            margin: 0 auto 22px;
+            border-radius: 16px;
+            font-size: 28px;
+            color: #00d9ff;
+            background: rgba(113,101,255,0.18);
+        }
+
+        .contact-card h2 {
+            font-size: 20px;
+            margin-bottom: 12px;
+        }
+
+        .contact-card p {
+            color: #a8adc5;
+            line-height: 1.8;
+            overflow-wrap: anywhere;
+        }
+
+        .contact-card a {
+            display: inline-block;
+            margin-top: 15px;
+            padding: 11px 20px;
+            border-radius: 7px;
+            background: linear-gradient(100deg, #7165ff, #477fff);
+            color: white;
+            text-decoration: none;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .contact-footer {
+            text-align: center;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            padding: 30px 15px;
+            color: #9299b5;
+            font-size: 12px;
+        }
+
+        .contact-footer strong {
+            display: block;
+            color: white;
+            font-size: 22px;
+            letter-spacing: 3px;
+            margin-bottom: 10px;
+        }
+
+        @media(max-width: 600px) {
+            .contact-hero {
+                padding-top: 65px;
+            }
+
+            .contact-container {
+                width: 90%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <header class="navbar">
+        <a href="index.html" class="logo">NOVEX<span>.</span></a>
+        <nav class="nav-links">
+            <a href="index.html">Home</a>
+            <a href="ai.html">AI Hub</a>
+            <a href="tools.html">Digital Tools</a>
+            <a href="about.html">About</a>
+            <a href="contact.html" class="active">Contact</a>
+        </nav>
+    </header>
+
+    <main>
+
+        <section class="contact-hero">
+            <span class="eyebrow">LET'S CONNECT</span>
+            <h1>CONTACT <span>NOVEX.</span></h1>
+            <p>
+                Every great digital experience begins with a connection.
+                Reach the founder of NOVEX through the official contact details below.
+            </p>
+        </section>
+
+        <section class="contact-container">
+
+            <article class="contact-card">
+                <div class="contact-icon">✦</div>
+                <h2>Founder</h2>
+                <p>Auwal Nuhu Musa</p>
+            </article>
+
+            <article class="contact-card">
+                <div class="contact-icon">☎</div>
+                <h2>Phone</h2>
+                <p>09014860771</p>
+                <a href="tel:09014860771">CALL NOW ↗</a>
+            </article>
+
+            <article class="contact-card">
+                <div class="contact-icon">✉</div>
+                <h2>Email</h2>
+                <p>bingelbappa2024@gmail.com</p>
+                <a href="mailto:bingelbappa2024@gmail.com">SEND EMAIL ↗</a>
+            </article>
+
+        </section>
+
+    </main>
+
+    <footer class="contact-footer">
+        <strong>NOVEX<span style="color:#00d9ff">.</span></strong>
+        YOUR DIGITAL UNIVERSE
+        <p>© 2026 NOVEX. All rights reserved.</p>
+    </footer>
+
+</body>
+</html>
