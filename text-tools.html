@@ -1,0 +1,390 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#070914">
+<title>Text Utilities | NOVEX</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+<style>
+:root {
+    --bg: #070914;
+    --panel: #11172b;
+    --purple: #7165ff;
+    --cyan: #00d9ff;
+    --muted: #9299b5;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background: var(--bg);
+    color: white;
+    font-family: Inter, sans-serif;
+    min-height: 100vh;
+}
+
+header {
+    padding: 22px 7%;
+    border-bottom: 1px solid rgba(255,255,255,.09);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo {
+    color: white;
+    text-decoration: none;
+    font-size: 25px;
+    font-weight: 900;
+    letter-spacing: 3px;
+}
+
+.logo span {
+    color: var(--cyan);
+}
+
+.back {
+    color: var(--cyan);
+    text-decoration: none;
+    font-size: 13px;
+}
+
+.hero {
+    text-align: center;
+    padding: 65px 20px 35px;
+    background: radial-gradient(circle at top, #29205c, transparent 70%);
+}
+
+.hero small {
+    color: var(--cyan);
+    letter-spacing: 4px;
+    font-weight: 700;
+}
+
+.hero h1 {
+    font-size: clamp(35px, 7vw, 65px);
+    margin: 20px 0;
+    font-weight: 900;
+}
+
+.hero h1 span {
+    background: linear-gradient(90deg, var(--purple), var(--cyan));
+    background-clip: text;
+    -webkit-background-clip: text;
+    color: transparent;
+}
+
+.hero p {
+    max-width: 550px;
+    margin: auto;
+    color: var(--muted);
+    line-height: 1.8;
+    font-size: 14px;
+}
+
+.workspace {
+    width: min(900px, 90%);
+    margin: 35px auto 90px;
+    background: var(--panel);
+    border: 1px solid rgba(0,217,255,.17);
+    border-radius: 18px;
+    padding: 28px;
+    box-shadow: 0 20px 70px rgba(0,0,0,.3);
+}
+
+.stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-bottom: 25px;
+}
+
+.stat {
+    background: #0b1020;
+    border: 1px solid rgba(255,255,255,.07);
+    padding: 18px 8px;
+    text-align: center;
+    border-radius: 10px;
+}
+
+.stat strong {
+    display: block;
+    font-size: 27px;
+    color: var(--cyan);
+}
+
+.stat span {
+    color: var(--muted);
+    font-size: 11px;
+}
+
+textarea {
+    width: 100%;
+    min-height: 250px;
+    resize: vertical;
+    background: #080d1b;
+    color: white;
+    border: 1px solid rgba(255,255,255,.12);
+    border-radius: 12px;
+    padding: 20px;
+    outline: none;
+    font-family: inherit;
+    font-size: 14px;
+    line-height: 1.8;
+}
+
+textarea:focus {
+    border-color: var(--cyan);
+    box-shadow: 0 0 20px rgba(0,217,255,.08);
+}
+
+textarea::placeholder {
+    color: #69718e;
+}
+
+.toolbar {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    margin-top: 20px;
+}
+
+button {
+    border: 1px solid rgba(0,217,255,.2);
+    background: #171e37;
+    color: white;
+    padding: 14px 12px;
+    border-radius: 8px;
+    font-weight: 700;
+    cursor: pointer;
+    font-size: 12px;
+    transition: .25s;
+}
+
+button:hover {
+    background: #262b50;
+    border-color: var(--cyan);
+}
+
+button.primary {
+    background: linear-gradient(100deg, var(--purple), #477fff);
+    border: none;
+}
+
+button.primary:hover {
+    filter: brightness(1.15);
+}
+
+button.danger {
+    border-color: rgba(255,90,110,.3);
+    color: #ff8594;
+}
+
+.message {
+    min-height: 24px;
+    color: var(--cyan);
+    text-align: center;
+    margin-top: 18px;
+    font-size: 12px;
+}
+
+footer {
+    border-top: 1px solid rgba(255,255,255,.08);
+    text-align: center;
+    padding: 25px;
+    color: var(--muted);
+    font-size: 11px;
+}
+
+@media(max-width: 500px) {
+    .workspace {
+        padding: 17px;
+    }
+
+    .stats {
+        gap: 7px;
+    }
+
+    .stat strong {
+        font-size: 22px;
+    }
+
+    .toolbar {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    textarea {
+        min-height: 210px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <a href="index.html" class="logo">NOVEX<span>.</span></a>
+    <a href="tools.html" class="back">← Digital Tools</a>
+</header>
+
+<section class="hero">
+    <small>NOVEX DIGITAL WORKSPACE</small>
+    <h1>TEXT <span>UTILITIES.</span></h1>
+    <p>
+        A simple and powerful workspace to transform,
+        analyze and manage your text.
+    </p>
+</section>
+
+<main class="workspace">
+
+    <div class="stats">
+        <div class="stat">
+            <strong id="wordCount">0</strong>
+            <span>WORDS</span>
+        </div>
+
+        <div class="stat">
+            <strong id="charCount">0</strong>
+            <span>CHARACTERS</span>
+        </div>
+
+        <div class="stat">
+            <strong id="lineCount">0</strong>
+            <span>LINES</span>
+        </div>
+    </div>
+
+    <textarea
+        id="textInput"
+        placeholder="Start typing or paste your text here..."
+        spellcheck="false"
+    ></textarea>
+
+    <div class="toolbar">
+
+        <button class="primary" onclick="convertUppercase()">
+            UPPERCASE
+        </button>
+
+        <button onclick="convertLowercase()">
+            lowercase
+        </button>
+
+        <button onclick="convertTitleCase()">
+            Title Case
+        </button>
+
+        <button onclick="removeExtraSpaces()">
+            Remove Extra Spaces
+        </button>
+
+        <button onclick="copyText()">
+            Copy Text
+        </button>
+
+        <button class="danger" onclick="clearText()">
+            Clear All
+        </button>
+
+    </div>
+
+    <div class="message" id="message"></div>
+
+</main>
+
+<footer>
+    NOVEX TEXT UTILITIES · © 2026 NOVEX
+</footer>
+
+<script>
+const textInput = document.getElementById("textInput");
+const wordCount = document.getElementById("wordCount");
+const charCount = document.getElementById("charCount");
+const lineCount = document.getElementById("lineCount");
+const message = document.getElementById("message");
+
+function updateStats() {
+    const text = textInput.value;
+
+    wordCount.textContent = text.trim()
+        ? text.trim().split(/\s+/).length
+        : 0;
+
+    charCount.textContent = text.length;
+
+    lineCount.textContent = text.length
+        ? text.split(/\r\n|\r|\n/).length
+        : 0;
+}
+
+function showMessage(text) {
+    message.textContent = text;
+}
+
+function convertUppercase() {
+    textInput.value = textInput.value.toUpperCase();
+    updateStats();
+    showMessage("Text converted to uppercase.");
+}
+
+function convertLowercase() {
+    textInput.value = textInput.value.toLowerCase();
+    updateStats();
+    showMessage("Text converted to lowercase.");
+}
+
+function convertTitleCase() {
+    textInput.value = textInput.value.toLowerCase()
+        .replace(/\b\w/g, letter => letter.toUpperCase());
+
+    updateStats();
+    showMessage("Text converted to title case.");
+}
+
+function removeExtraSpaces() {
+    textInput.value = textInput.value
+        .replace(/[ \t]+/g, " ")
+        .replace(/ *\n */g, "\n")
+        .trim();
+
+    updateStats();
+    showMessage("Extra spaces removed.");
+}
+
+async function copyText() {
+    if (!textInput.value) {
+        showMessage("There is no text to copy.");
+        return;
+    }
+
+    try {
+        await navigator.clipboard.writeText(textInput.value);
+        showMessage("Text copied successfully!");
+    } catch (error) {
+        textInput.select();
+        const copied = document.execCommand("copy");
+        showMessage(copied ? "Text copied successfully!" : "Please copy the selected text manually.");
+    }
+}
+
+function clearText() {
+    textInput.value = "";
+    updateStats();
+    showMessage("Workspace cleared.");
+}
+
+textInput.addEventListener("input", updateStats);
+updateStats();
+</script>
+
+</body>
+</html>
