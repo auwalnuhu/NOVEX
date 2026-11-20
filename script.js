@@ -1,119 +1,95 @@
-/* ==========================================
-   NOVEX — JAVASCRIPT ENGINE
-   Main interactive functionality
-========================================== */
-
 "use strict";
 
-/* 1. SELECT WEBSITE ELEMENTS */
+/* ======================================
+   NOVEX — DIGITAL UNIVERSE ENGINE
+====================================== */
 
-const menuToggle = document.getElementById("menuToggle");
-const navLinks = document.getElementById("navLinks");
+document.addEventListener("DOMContentLoaded", () => {
 
-const navigationLinks = document.querySelectorAll(
-    ".nav-links a"
-);
+    const menuToggle = document.getElementById("menuToggle");
+    const navLinks = document.getElementById("navLinks");
 
-/* 2. MOBILE NAVIGATION */
+    /* MOBILE NAVIGATION */
 
-function toggleNavigation() {
-    if (!menuToggle || !navLinks) return;
+    if (menuToggle && navLinks) {
 
-    navLinks.classList.toggle("show");
+        menuToggle.setAttribute("aria-expanded", "false");
 
-    const isOpen = navLinks.classList.contains("show");
+        menuToggle.addEventListener("click", () => {
 
-    menuToggle.textContent = isOpen ? "✕" : "☰";
+            const isOpen = navLinks.classList.toggle("show");
 
-    menuToggle.setAttribute(
-        "aria-expanded",
-        String(isOpen)
-    );
-}
+            menuToggle.textContent = isOpen ? "✕" : "☰";
 
-if (menuToggle) {
-    menuToggle.addEventListener(
-        "click",
-        toggleNavigation
-    );
-}
-
-/* 3. CLOSE MENU AFTER CLICKING A LINK */
-
-navigationLinks.forEach(function(link) {
-
-    link.addEventListener("click", function() {
-
-        if (navLinks) {
-            navLinks.classList.remove("show");
-        }
-
-        if (menuToggle) {
-            menuToggle.textContent = "☰";
             menuToggle.setAttribute(
                 "aria-expanded",
-                "false"
+                String(isOpen)
             );
-        }
+
+        });
+
+    }
+
+    /* CLOSE MENU AFTER NAVIGATION */
+
+    document.querySelectorAll(".nav-links a").forEach(link => {
+
+        link.addEventListener("click", () => {
+
+            navLinks?.classList.remove("show");
+
+            if (menuToggle) {
+                menuToggle.textContent = "☰";
+                menuToggle.setAttribute("aria-expanded", "false");
+            }
+
+        });
 
     });
 
-});
+    /* ACTIVE NAVIGATION */
 
-/* 4. ACTIVE NAVIGATION LINK */
+    const sections = document.querySelectorAll("main section");
+    const links = document.querySelectorAll(".nav-links a");
 
-function updateActiveNavigation() {
+    function updateNavigation() {
 
-    const currentSection = window.scrollY + 150;
+        let current = "home";
 
-    navigationLinks.forEach(function(link) {
+        sections.forEach(section => {
 
-        const targetId = link.getAttribute("href");
+            const sectionTop = section.offsetTop - 180;
 
-        if (!targetId || !targetId.startsWith("#")) {
-            return;
-        }
+            if (window.scrollY >= sectionTop) {
+                current = section.id;
+            }
 
-        const section = document.querySelector(targetId);
+        });
 
-        if (!section) return;
+        links.forEach(link => {
 
-        const sectionTop = section.offsetTop;
-        const sectionBottom =
-            sectionTop + section.offsetHeight;
+            link.classList.toggle(
+                "active",
+                link.getAttribute("href") === "#" + current
+            );
 
-        if (
-            currentSection >= sectionTop &&
-            currentSection < sectionBottom
-        ) {
-            navigationLinks.forEach(function(item) {
-                item.classList.remove("active");
-            });
+        });
 
-            link.classList.add("active");
-        }
+    }
 
-    });
+    window.addEventListener("scroll", updateNavigation);
 
-}
+    /* SCROLL REVEAL */
 
-window.addEventListener(
-    "scroll",
-    updateActiveNavigation
-);
+    const revealElements = document.querySelectorAll(
+        ".feature-card, .section-heading, .about"
+    );
 
-/* 5. REVEAL ELEMENTS WHEN SCROLLING */
+    if ("IntersectionObserver" in window) {
 
-const revealElements = document.querySelectorAll(
-    ".feature-card, .section-heading, .about"
-);
+        const observer = new IntersectionObserver(entries => {
 
-if ("IntersectionObserver" in window) {
-
-    const revealObserver = new IntersectionObserver(
-        function(entries, observer) {
-
-            entries.forEach(function(entry) {
+            entries.forEach(entry => {
 
                 if (entry.isIntersecting) {
 
@@ -125,79 +101,37 @@ if ("IntersectionObserver" in window) {
 
             });
 
-        },
-        {
-            threshold: 0.12
-        }
-    );
+        }, { threshold: 0.12 });
 
-    revealElements.forEach(function(element) {
+        revealElements.forEach(element => {
 
-        element.classList.add("reveal");
+            element.classList.add("reveal");
+            observer.observe(element);
 
-        revealObserver.observe(element);
+        });
 
-    });
+    } else {
 
-}
+        revealElements.forEach(element => {
+            element.classList.add("revealed");
+        });
 
-/* 6. BUTTON INTERACTION */
+    }
 
-const exploreButton = document.querySelector(
-    ".primary-btn"
-);
+    /* BUTTON FEEDBACK */
 
-if (exploreButton) {
+    document.querySelectorAll(".primary-btn").forEach(button => {
 
-    exploreButton.addEventListener("click", function() {
-
-        console.log(
-            "Welcome to the NOVEX digital universe."
-        );
+        button.addEventListener("click", () => {
+            console.log("Welcome to NOVEX!");
+        });
 
     });
 
-}
+    /* STARTUP */
 
-/* 7. FEATURE CARD INTERACTIONS */
+    updateNavigation();
 
-const featureCards = document.querySelectorAll(
-    ".feature-card"
-);
-
-featureCards.forEach(function(card, index) {
-
-    card.addEventListener("mouseenter", function() {
-
-        console.log(
-            "NOVEX feature selected:",
-            index + 1
-        );
-
-    });
+    console.log("NOVEX DIGITAL ENGINE ONLINE.");
 
 });
-
-/* 8. WEBSITE STARTUP */
-
-function initializeNOVEX() {
-
-    console.log(
-        "%c NOVEX INITIALIZED ",
-        "background:#7165ff;color:white;padding:10px;font-weight:bold;"
-    );
-
-    console.log(
-        "Your digital universe is ready."
-    );
-
-    updateActiveNavigation();
-
-}
-
-/* 9. RUN WEBSITE */
-
-document.addEventListener(
-    "DOMContentLoaded",
-    initializeNOVEX
-);
