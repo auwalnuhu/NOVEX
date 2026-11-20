@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Unit Converter | NOVEX</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#070914;color:white;font-family:Arial,sans-serif;min-height:100vh}
+header{padding:22px 7%;display:flex;justify-content:space-between;border-bottom:1px solid #252943}
+.logo{color:white;text-decoration:none;font-size:25px;font-weight:900;letter-spacing:3px}
+.logo span{color:#00d9ff}
+.back{color:#00d9ff;text-decoration:none}
+.hero{text-align:center;padding:50px 15px;background:radial-gradient(circle at top,#29205c,transparent 75%)}
+.hero small{color:#00d9ff;letter-spacing:4px}
+h1{font-size:clamp(35px,7vw,55px);margin:18px 0}
+h1 span{color:#00d9ff}
+.hero p{color:#a0a8c0}
+.workspace{width:min(550px,90%);margin:30px auto 80px;padding:25px;background:#11172b;border:1px solid #292e50;border-radius:18px}
+label{display:block;margin:18px 0 9px;color:#c6cbe0;font-size:13px}
+select,input{width:100%;padding:15px;background:#080d1b;color:white;border:1px solid #343b5c;border-radius:9px;font-size:15px}
+input:focus,select:focus{outline:none;border-color:#00d9ff}
+button{width:100%;padding:15px;margin-top:20px;background:linear-gradient(100deg,#7165ff,#168dff);color:white;border:0;border-radius:9px;font-weight:bold;font-size:14px}
+.result{margin-top:22px;padding:20px;text-align:center;background:#080d1b;border-radius:10px}
+.result small{color:#9299b5}
+#output{display:block;color:#00d9ff;font-size:27px;margin-top:10px;overflow-wrap:anywhere}
+footer{text-align:center;padding:25px;color:#9299b5;border-top:1px solid #252943;font-size:12px}
+</style>
+</head>
+<body>
+<header>
+<a href="index.html" class="logo">NOVEX<span>.</span></a>
+<a href="tools.html" class="back">← Digital Tools</a>
+</header>
+<section class="hero">
+<small>NOVEX DIGITAL WORKSPACE</small>
+<h1>UNIT <span>CONVERTER.</span></h1>
+<p>Convert common measurements instantly.</p>
+</section>
+<main class="workspace">
+<label for="category">Conversion Category</label>
+<select id="category" onchange="updateUnits()">
+<option value="length">Length</option>
+<option value="weight">Weight</option>
+<option value="temperature">Temperature</option>
+<option value="volume">Volume</option>
+</select>
+<label for="amount">Enter Value</label>
+<input id="amount" type="number" placeholder="Enter a number" value="1">
+<label for="from">From</label>
+<select id="from"></select>
+<label for="to">To</label>
+<select id="to"></select>
+<button onclick="convert()">CONVERT NOW</button>
+<div class="result">
+<small>CONVERSION RESULT</small>
+<strong id="output">Your result appears here</strong>
+</div>
+</main>
+<footer>NOVEX UNIT CONVERTER · © 2026 NOVEX</footer>
+<script>
+const units={
+length:{Meter:1,Kilometer:1000,Centimeter:.01,Millimeter:.001,Mile:1609.344,Foot:.3048,Inch:.0254},
+weight:{Kilogram:1,Gram:.001,Milligram:.000001,Pound:.45359237,Ounce:.0283495,Tonne:1000},
+volume:{Liter:1,Milliliter:.001,"Cubic meter":1000,Gallon:3.78541,Cup:.236588},
+temperature:{Celsius:1,Fahrenheit:1,Kelvin:1}
+};
+function updateUnits(){
+ const category=document.getElementById("category").value;
+ const names=Object.keys(units[category]);
+ ["from","to"].forEach(id=>{
+  document.getElementById(id).innerHTML=names.map((name,i)=>`<option value="${name}" ${i===(id==="to"?1:0)?"selected":""}>${name}</option>`).join("");
+ });
+}
+function convert(){
+ const category=document.getElementById("category").value;
+ const value=Number(document.getElementById("amount").value);
+ const from=document.getElementById("from").value;
+ const to=document.getElementById("to").value;
+ if(document.getElementById("amount").value.trim()===""||!Number.isFinite(value)){
+  document.getElementById("output").textContent="Enter a valid number";
+  return;
+ }
+ let result;
+ if(category==="temperature"){
+  let c=from==="Celsius"?value:from==="Fahrenheit"?(value-32)*5/9:value-273.15;
+  result=to==="Celsius"?c:to==="Fahrenheit"?c*9/5+32:c+273.15;
+ }else{
+  result=value*units[category][from]/units[category][to];
+ }
+ document.getElementById("output").textContent=Number(result.toPrecision(10))+" "+to;
+}
+updateUnits();
+</script>
+</body>
+</html>
