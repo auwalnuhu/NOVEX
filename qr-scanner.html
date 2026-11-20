@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QR Scanner | NOVEX</title>
+<script src="https://unpkg.com/html5-qrcode"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#070914;color:white;font-family:Arial,sans-serif;min-height:100vh}
+header{padding:22px 7%;display:flex;justify-content:space-between;border-bottom:1px solid #252943}
+.logo{color:white;text-decoration:none;font-size:25px;font-weight:900;letter-spacing:3px}
+.logo span{color:#00d9ff}
+.back{color:#00d9ff;text-decoration:none}
+.hero{text-align:center;padding:50px 15px;background:radial-gradient(circle at top,#29205c,transparent 75%)}
+.hero small{color:#00d9ff;letter-spacing:4px}
+h1{font-size:clamp(35px,7vw,55px);margin:18px 0}
+h1 span{color:#00d9ff}
+.hero p{color:#a0a8c0;line-height:1.7}
+.workspace{width:min(600px,92%);margin:30px auto 80px;padding:25px;background:#11172b;border:1px solid #292e50;border-radius:18px}
+#reader{width:100%;overflow:hidden;border-radius:12px;background:#080d1b}
+button{width:100%;padding:15px;margin-top:15px;background:linear-gradient(100deg,#7165ff,#168dff);color:white;border:0;border-radius:9px;font-weight:bold;cursor:pointer}
+#result{display:none;margin-top:20px;padding:18px;background:#080d1b;border:1px solid #343b5c;border-radius:10px;overflow-wrap:anywhere}
+#result strong{display:block;color:#00d9ff;margin-bottom:12px}
+#decoded{line-height:1.6;font-size:14px;user-select:text}
+#status{color:#9299b5;text-align:center;font-size:13px;margin:16px 0}
+a.result-link{display:block;color:#00d9ff;margin-top:12px;overflow-wrap:anywhere}
+footer{text-align:center;padding:25px;color:#9299b5;border-top:1px solid #252943;font-size:12px}
+</style>
+</head>
+<body>
+<header>
+<a href="index.html" class="logo">NOVEX<span>.</span></a>
+<a href="tools.html" class="back">← Digital Tools</a>
+</header>
+
+<section class="hero">
+<small>NOVEX DIGITAL WORKSPACE</small>
+<h1>QR <span>SCANNER.</span></h1>
+<p>Scan QR codes using your device camera.</p>
+</section>
+
+<main class="workspace">
+<div id="reader"></div>
+<p id="status">Allow camera access to start scanning.</p>
+
+<button id="startButton" onclick="startScanner()">START SCANNER</button>
+<button onclick="stopScanner()">STOP SCANNER</button>
+
+<div id="result">
+<strong>QR CODE DETECTED</strong>
+<div id="decoded"></div>
+<button onclick="copyResult()">COPY RESULT</button>
+<a id="openLink" class="result-link" target="_blank" rel="noopener noreferrer" style="display:none">OPEN LINK ↗</a>
+</div>
+</main>
+
+<footer>NOVEX QR SCANNER · © 2026 NOVEX</footer>
+
+<script>
+let scanner=null;
+let running=false;
+let lastResult="";
+
+async function startScanner(){
+ if(running)return;
+
+ if(typeof Html5Qrcode==="undefined"){
+  document.getElementById("status").textContent=
+  "Scanner library unavailable. Check your internet connection.";
+  return;
+ }
+
+ try{
+  if(!scanner)scanner=new Html5Qrcode("reader");
+
+  await scanner.start(
+   {facingMode:"environment"},
+   {fps:10,qrbox:{width:220,height:220}},
+   onScanSuccess,
+   ()=>{}
+  );
+
+  running=true;
+  document.getElementById("status").textContent="Camera active. Point it at a QR code.";
+ }catch(error){
+  document.getElementById("status").textContent=
+  "Camera unavailable. Allow camera permission and use HTTPS.";
+ }
+}
+
+function onScanSuccess(decodedText){
+ if(!decodedText||decodedText===lastResult)return;
+ lastResult=decodedText;
+
+ document.getElementById("decoded").textContent=decodedText;
+ document.getElementById("result").style.display="block";
+
+ const link=document.getElementById("openLink");
+ try{
+  const url=new URL(decodedText);
+  if(url.protocol==="https:"||url.protocol==="http:"){
+   link.href=url.href;
+   link.style.display="block";
+  }else{
+   link.style.display="none";
+  }
+ }catch(error){
+  link.style.display="none";
+ }
+
+ stopScanner();
+ document.getElementById("status").textContent="QR code scanned successfully!";
+}
+
+async function stopScanner(){
+ if(scanner&&running){
+  try{await scanner.stop();}catch(error){}
+  running=false;
+ }
+}
+
+async function copyResult(){
+ if(!lastResult)return;
+ try{
+  await navigator.clipboard.writeText(lastResult);
+  document.getElementById("status").textContent="Result copied successfully!";
+ }catch(error){
+  document.getElementById("status").textContent="Copy unavailable. Select the result manually.";
+ }
+}
+</script>
+</body>
+</html>
