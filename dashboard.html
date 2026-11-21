@@ -481,25 +481,101 @@ async function deleteTask(index) {
     taskStatus.textContent = "☁️ Task deleted from cloud.";
 }
 
-// Quick notes remain local for now
+// Quick Notes — NOVEX Cloud Sync
 const quickNote = document.getElementById("quickNote");
 const noteStatus = document.getElementById("noteStatus");
 
-quickNote.value = localStorage.getItem("novex_quick_note") || "";
+let noteSaveTimer = null;
+let noteSaveQueue = Promise.resolve();
+
+quickNote.disabled = true;
 
 function updateNoteCount() {
-    document.getElementById("noteCount").textContent = quickNote.value.length;
+    document.getElementById("noteCount").textContent =
+        quickNote.value.length;
 }
 
-updateNoteCount();
+async function loadQuickNote() {
+    noteStatus.textContent = "Connecting to NOVEX Cloud...";
+
+    const { data, error } = await authClient
+        .from("novex_quick_notes")
+        .select("content")
+        .eq("user_id", currentUser.id)
+        .maybeSingle();
+
+    if (error) {
+        console.error("Quick Notes loading error:", error);
+        noteStatus.textContent = "Cloud loading failed: " + error.message;
+        quickNote.disabled = false;
+        return;
+    }
+
+    if (data) {
+        quickNote.value = data.content || "";
+    } else {
+        const oldNote = localStorage.getItem("novex_quick_note") || "";
+
+        const { error: saveError } = await authClient
+            .from("novex_quick_notes")
+            .upsert({
+                user_id: currentUser.id,
+                content: oldNote,
+                updated_at: new Date().toISOString()
+            }, { onConflict: "user_id" });
+
+        if (saveError) {
+            console.error("Quick Notes migration error:", saveError);
+            noteStatus.textContent = "Migration failed: " + saveError.message;
+            quickNote.disabled = false;
+            return;
+        }
+
+        localStorage.removeItem("novex_quick_note");
+        quickNote.value = oldNote;
+    }
+
+    updateNoteCount();
+    quickNote.disabled = false;
+    noteStatus.textContent = "☁️ Connected — your notes sync to NOVEX Cloud.";
+}
+
+function saveQuickNote() {
+    const content = quickNote.value;
+
+    noteSaveQueue = noteSaveQueue.then(async () => {
+        const { error } = await authClient
+            .from("novex_quick_notes")
+            .upsert({
+                user_id: currentUser.id,
+                content: content,
+                updated_at: new Date().toISOString()
+            }, { onConflict: "user_id" });
+
+        if (error) {
+            console.error("Quick Notes save error:", error);
+            noteStatus.textContent = "Cloud save failed: " + error.message;
+            return;
+        }
+
+        noteStatus.textContent = "☁️ Saved to NOVEX Cloud.";
+    });
+
+    return noteSaveQueue;
+}
 
 quickNote.addEventListener("input", () => {
-    localStorage.setItem("novex_quick_note", quickNote.value);
-    noteStatus.textContent = "Saved on this device.";
     updateNoteCount();
+    noteStatus.textContent = "Saving to NOVEX Cloud...";
+
+    clearTimeout(noteSaveTimer);
+
+    noteSaveTimer = setTimeout(() => {
+        saveQuickNote();
+    }, 700);
 });
 
-// Start dashboard after authentication
+  // Start dashboard after authentication
 async function startDashboard() {
     const authenticated = await protectDashboard();
 
