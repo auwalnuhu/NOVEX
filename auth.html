@@ -4,9 +4,15 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>NOVEX | Account Access</title>
+
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:Arial,sans-serif;background:#080d1c;color:white;min-height:100vh;display:grid;place-items:center;padding:20px}
+body{
+font-family:Arial,sans-serif;
+background:#080d1c;color:white;
+min-height:100vh;display:grid;
+place-items:center;padding:20px
+}
 .container{width:100%;max-width:440px}
 .logo{text-align:center;font-size:34px;font-weight:900;color:#35d9ff;margin-bottom:8px}
 .logo span{color:white}
@@ -35,9 +41,10 @@ input:focus{border-color:#35d9ff}
 footer{text-align:center;color:#61718b;font-size:11px;margin-top:25px}
 </style>
 </head>
-<body>
 
+<body>
 <main class="container">
+
 <div class="logo">NOVEX<span>.</span></div>
 <p class="subtitle">Your Digital Universe</p>
 
@@ -93,11 +100,14 @@ footer{text-align:center;color:#61718b;font-size:11px;margin-top:25px}
 
 <div class="back"><a href="index.html">← Return to NOVEX Home</a></div>
 <footer>SECURE ACCOUNT ACCESS · NOVEX 2026</footer>
+
 </main>
 
+<!-- SUPABASE LIBRARY AND CONFIGURATION MUST LOAD FIRST -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="supabase-config.js"></script>
 
+<!-- NOVEX ACCOUNT SYSTEM -->
 <script>
 const client = window.supabaseClient;
 
@@ -116,7 +126,7 @@ const authForm = document.getElementById("authForm");
 let mode = "login";
 let recoveryMode = false;
 
-function showMessage(text, error=false){
+function showMessage(text,error=false){
     message.textContent = text;
     message.className = "message" + (error ? " error" : "");
     message.style.display = "block";
@@ -136,11 +146,12 @@ function setMode(newMode){
     document.getElementById("backToLogin").classList.add("hidden");
     passwordGroup.classList.remove("hidden");
     confirmGroup.classList.add("hidden");
-    nameGroup.classList.toggle("hidden", mode !== "signup");
-    forgot.classList.toggle("hidden", mode !== "login");
 
-    loginTab.classList.toggle("active", mode === "login");
-    signupTab.classList.toggle("active", mode === "signup");
+    nameGroup.classList.toggle("hidden",mode !== "signup");
+    forgot.classList.toggle("hidden",mode !== "login");
+
+    loginTab.classList.toggle("active",mode === "login");
+    signupTab.classList.toggle("active",mode === "signup");
 
     document.getElementById("password").autocomplete =
         mode === "login" ? "current-password" : "new-password";
@@ -166,7 +177,7 @@ document.getElementById("showPassword").addEventListener("click",function(){
     this.textContent = input.type === "password" ? "Show" : "Hide";
 });
 
-function setLoading(loading, text){
+function setLoading(loading,text){
     submitButton.disabled = loading;
     submitButton.textContent = loading ? "Please wait..." : text;
 }
@@ -176,7 +187,7 @@ authForm.addEventListener("submit",async function(event){
     hideMessage();
 
     if(!client){
-        showMessage("Supabase connection not found. Check supabase-config.js.",true);
+        showMessage("Supabase connection not found. Check supabase-config.js and its loading order.",true);
         return;
     }
 
@@ -205,7 +216,6 @@ authForm.addEventListener("submit",async function(event){
             showMessage(error.message,true);
         }else{
             showMessage("Password updated successfully. You can now log in.");
-            recoveryMode = false;
             setMode("login");
         }
         return;
@@ -215,6 +225,13 @@ authForm.addEventListener("submit",async function(event){
 
     try{
         if(mode === "signup"){
+
+            if(!name){
+                showMessage("Please enter your full name.",true);
+                setLoading(false,"Create NOVEX Account");
+                return;
+            }
+
             if(password.length < 8){
                 showMessage("Password must contain at least 8 characters.",true);
                 setLoading(false,"Create NOVEX Account");
@@ -245,8 +262,10 @@ authForm.addEventListener("submit",async function(event){
             }
 
         }else{
+
             const {data,error} = await client.auth.signInWithPassword({
-                email,password
+                email,
+                password
             });
 
             if(error) throw error;
@@ -254,6 +273,7 @@ authForm.addEventListener("submit",async function(event){
             showMessage("Login successful! Welcome to NOVEX.");
             location.href = "dashboard.html";
         }
+
     }catch(error){
         showMessage(error.message || "Something went wrong. Please try again.",true);
     }
@@ -296,7 +316,7 @@ document.getElementById("returnButton").addEventListener("click",()=>{
 async function checkRecovery(){
     if(!client) return;
 
-    client.auth.onAuthStateChange(async(event)=>{
+    client.auth.onAuthStateChange((event)=>{
         if(event === "PASSWORD_RECOVERY"){
             recoveryMode = true;
             mode = "recovery";
@@ -308,27 +328,27 @@ async function checkRecovery(){
             confirmGroup.classList.remove("hidden");
             document.getElementById("backToLogin").classList.remove("hidden");
 
-            document.getElementById("confirmPassword").autocomplete="new-password";
-            heading.textContent="Reset your password";
-            description.textContent="Choose a new password for your NOVEX account.";
-            submitButton.textContent="Update Password";
+            document.getElementById("confirmPassword").autocomplete = "new-password";
+            heading.textContent = "Reset your password";
+            description.textContent = "Choose a new password for your NOVEX account.";
+            submitButton.textContent = "Update Password";
             showMessage("Enter your new password below.");
         }
     });
 }
 
 if(!client){
-    showMessage("Supabase client unavailable. Check your configuration and script loading.",true);
+    showMessage("Supabase client unavailable. Check supabase-config.js and script loading.",true);
 }else{
     checkRecovery();
+
     client.auth.getSession().then(({data,error})=>{
         if(!error && data.session){
-            location.href="dashboard.html";
+            location.href = "dashboard.html";
         }
     });
 }
 </script>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="supabase-config.js"></script>
+
 </body>
 </html>
