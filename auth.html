@@ -4,15 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>NOVEX | Account Access</title>
-
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-body{
-font-family:Arial,sans-serif;
-background:#080d1c;color:white;
-min-height:100vh;display:grid;
-place-items:center;padding:20px
-}
+body{font-family:Arial,sans-serif;background:#080d1c;color:white;min-height:100vh;display:grid;place-items:center;padding:20px}
 .container{width:100%;max-width:440px}
 .logo{text-align:center;font-size:34px;font-weight:900;color:#35d9ff;margin-bottom:8px}
 .logo span{color:white}
@@ -41,15 +35,12 @@ input:focus{border-color:#35d9ff}
 footer{text-align:center;color:#61718b;font-size:11px;margin-top:25px}
 </style>
 </head>
-
 <body>
 <main class="container">
-
 <div class="logo">NOVEX<span>.</span></div>
 <p class="subtitle">Your Digital Universe</p>
 
 <section class="card">
-
 <div class="tabs" id="tabs">
 <button class="active" id="loginTab" type="button">Login</button>
 <button id="signupTab" type="button">Create Account</button>
@@ -59,16 +50,13 @@ footer{text-align:center;color:#61718b;font-size:11px;margin-top:25px}
 <p class="description" id="description">Sign in to continue to your NOVEX workspace.</p>
 
 <form id="authForm">
-
 <div id="nameGroup" class="hidden">
 <label for="name">Full name</label>
 <input id="name" type="text" placeholder="Enter your name" autocomplete="name">
 </div>
 
-<div id="emailGroup">
 <label for="email">Email address</label>
 <input id="email" type="email" placeholder="you@example.com" required autocomplete="email">
-</div>
 
 <div id="passwordGroup">
 <label for="password">Password</label>
@@ -95,45 +83,36 @@ footer{text-align:center;color:#61718b;font-size:11px;margin-top:25px}
 </div>
 
 <div class="message" id="message" role="status"></div>
-
 </section>
 
 <div class="back"><a href="index.html">← Return to NOVEX Home</a></div>
 <footer>SECURE ACCOUNT ACCESS · NOVEX 2026</footer>
-
 </main>
 
-<!-- SUPABASE LIBRARY AND CONFIGURATION MUST LOAD FIRST -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script src="supabase-config.js"></script>
 
-<!-- NOVEX ACCOUNT SYSTEM -->
 <script>
 const client = window.supabaseClient;
 
-const loginTab = document.getElementById("loginTab");
-const signupTab = document.getElementById("signupTab");
-const heading = document.getElementById("heading");
-const description = document.getElementById("description");
-const nameGroup = document.getElementById("nameGroup");
-const confirmGroup = document.getElementById("confirmGroup");
-const passwordGroup = document.getElementById("passwordGroup");
-const forgot = document.getElementById("forgot");
-const message = document.getElementById("message");
-const submitButton = document.getElementById("submitButton");
-const authForm = document.getElementById("authForm");
+const $ = id => document.getElementById(id);
 
 let mode = "login";
 let recoveryMode = false;
 
 function showMessage(text,error=false){
-    message.textContent = text;
-    message.className = "message" + (error ? " error" : "");
-    message.style.display = "block";
+    $("message").textContent = text;
+    $("message").className = "message" + (error ? " error" : "");
+    $("message").style.display = "block";
 }
 
 function hideMessage(){
-    message.style.display = "none";
+    $("message").style.display = "none";
+}
+
+function setLoading(loading,text){
+    $("submitButton").disabled = loading;
+    $("submitButton").textContent = loading ? "Please wait..." : text;
 }
 
 function setMode(newMode){
@@ -141,128 +120,104 @@ function setMode(newMode){
     recoveryMode = false;
     hideMessage();
 
-    authForm.classList.remove("hidden");
-    document.getElementById("tabs").classList.remove("hidden");
-    document.getElementById("backToLogin").classList.add("hidden");
-    passwordGroup.classList.remove("hidden");
-    confirmGroup.classList.add("hidden");
+    $("authForm").classList.remove("hidden");
+    $("tabs").classList.remove("hidden");
+    $("backToLogin").classList.add("hidden");
+    $("passwordGroup").classList.remove("hidden");
+    $("confirmGroup").classList.toggle("hidden",newMode !== "signup");
+    $("nameGroup").classList.toggle("hidden",newMode !== "signup");
+    $("forgot").classList.toggle("hidden",newMode !== "login");
 
-    nameGroup.classList.toggle("hidden",mode !== "signup");
-    forgot.classList.toggle("hidden",mode !== "login");
+    $("loginTab").classList.toggle("active",newMode === "login");
+    $("signupTab").classList.toggle("active",newMode === "signup");
 
-    loginTab.classList.toggle("active",mode === "login");
-    signupTab.classList.toggle("active",mode === "signup");
+    $("password").autocomplete = newMode === "login" ? "current-password" : "new-password";
 
-    document.getElementById("password").autocomplete =
-        mode === "login" ? "current-password" : "new-password";
+    $("heading").textContent = newMode === "login" ? "Welcome back" : "Create your account";
+    $("description").textContent = newMode === "login"
+        ? "Sign in to continue to your NOVEX workspace."
+        : "Join NOVEX and explore your digital universe.";
 
-    if(mode === "login"){
-        heading.textContent = "Welcome back";
-        description.textContent = "Sign in to continue to your NOVEX workspace.";
-        submitButton.textContent = "Login to NOVEX";
-    }else{
-        heading.textContent = "Create your account";
-        description.textContent = "Join NOVEX and explore your digital universe.";
-        confirmGroup.classList.remove("hidden");
-        submitButton.textContent = "Create NOVEX Account";
-    }
+    $("submitButton").textContent = newMode === "login" ? "Login to NOVEX" : "Create NOVEX Account";
 }
 
-loginTab.addEventListener("click",()=>setMode("login"));
-signupTab.addEventListener("click",()=>setMode("signup"));
+$("loginTab").addEventListener("click",()=>setMode("login"));
+$("signupTab").addEventListener("click",()=>setMode("signup"));
 
-document.getElementById("showPassword").addEventListener("click",function(){
-    const input = document.getElementById("password");
-    input.type = input.type === "password" ? "text" : "password";
-    this.textContent = input.type === "password" ? "Show" : "Hide";
+$("showPassword").addEventListener("click",function(){
+    const field = $("password");
+    field.type = field.type === "password" ? "text" : "password";
+    this.textContent = field.type === "password" ? "Show" : "Hide";
 });
 
-function setLoading(loading,text){
-    submitButton.disabled = loading;
-    submitButton.textContent = loading ? "Please wait..." : text;
-}
-
-authForm.addEventListener("submit",async function(event){
+$("authForm").addEventListener("submit",async event=>{
     event.preventDefault();
     hideMessage();
 
     if(!client){
-        showMessage("Supabase connection not found. Check supabase-config.js and its loading order.",true);
+        showMessage("Supabase is unavailable. Please check your connection and configuration.",true);
         return;
     }
 
-    const email = document.getElementById("email").value.trim();
-    const password = document.getElementById("password").value;
-    const name = document.getElementById("name").value.trim();
+    const email = $("email").value.trim();
+    const password = $("password").value;
+    const name = $("name").value.trim();
+
+    if(password.length < 8){
+        showMessage("Password must contain at least 8 characters.",true);
+        return;
+    }
 
     if(recoveryMode){
-        if(password.length < 8){
-            showMessage("Your new password must be at least 8 characters.",true);
-            return;
-        }
-
-        if(password !== document.getElementById("confirmPassword").value){
+        if(password !== $("confirmPassword").value){
             showMessage("Your passwords do not match.",true);
             return;
         }
 
         setLoading(true,"Update Password");
 
-        const {error} = await client.auth.updateUser({password});
+        try{
+            const {error} = await client.auth.updateUser({password});
+            if(error) throw error;
 
-        setLoading(false,"Update Password");
-
-        if(error){
-            showMessage(error.message,true);
-        }else{
             showMessage("Password updated successfully. You can now log in.");
             setMode("login");
+        }catch(error){
+            showMessage(error.message,true);
         }
+
+        setLoading(false,"Update Password");
         return;
     }
 
-    setLoading(true,mode === "login" ? "Login to NOVEX" : "Create NOVEX Account");
+    setLoading(true,"Please wait...");
 
     try{
         if(mode === "signup"){
+            if(!name) throw new Error("Please enter your full name.");
 
-            if(!name){
-                showMessage("Please enter your full name.",true);
-                setLoading(false,"Create NOVEX Account");
-                return;
-            }
-
-            if(password.length < 8){
-                showMessage("Password must contain at least 8 characters.",true);
-                setLoading(false,"Create NOVEX Account");
-                return;
-            }
-
-            if(password !== document.getElementById("confirmPassword").value){
-                showMessage("Your passwords do not match.",true);
-                setLoading(false,"Create NOVEX Account");
-                return;
+            if(password !== $("confirmPassword").value){
+                throw new Error("Your passwords do not match.");
             }
 
             const {data,error} = await client.auth.signUp({
                 email,
                 password,
                 options:{
-                    data:{full_name:name}
+                    data:{full_name:name},
+                    emailRedirectTo:location.origin + "/auth.html"
                 }
             });
 
             if(error) throw error;
 
             if(data.session){
-                showMessage("Account created! Opening your NOVEX dashboard...");
                 location.href = "dashboard.html";
             }else{
-                showMessage("Account created! Check your email for the confirmation link before logging in.");
+                showMessage("Account created! Check your email and confirm your account before logging in.");
             }
 
         }else{
-
             const {data,error} = await client.auth.signInWithPassword({
                 email,
                 password
@@ -275,21 +230,21 @@ authForm.addEventListener("submit",async function(event){
         }
 
     }catch(error){
-        showMessage(error.message || "Something went wrong. Please try again.",true);
+        showMessage(error.message || "Something went wrong.",true);
     }
 
     setLoading(false,mode === "login" ? "Login to NOVEX" : "Create NOVEX Account");
 });
 
-document.getElementById("forgotButton").addEventListener("click",async()=>{
+$("forgotButton").addEventListener("click",async()=>{
     hideMessage();
 
     if(!client){
-        showMessage("Supabase connection not found.",true);
+        showMessage("Supabase connection unavailable.",true);
         return;
     }
 
-    const email = document.getElementById("email").value.trim();
+    const email = $("email").value.trim();
 
     if(!email){
         showMessage("Enter your email address first.",true);
@@ -298,57 +253,47 @@ document.getElementById("forgotButton").addEventListener("click",async()=>{
 
     try{
         const {error} = await client.auth.resetPasswordForEmail(email,{
-            redirectTo:location.origin + location.pathname
+            redirectTo:location.origin + "/auth.html"
         });
 
         if(error) throw error;
 
-        showMessage("If an account exists for that email, a password reset link has been sent.");
+        showMessage("If an account exists, a password reset link has been sent.");
     }catch(error){
         showMessage(error.message,true);
     }
 });
 
-document.getElementById("returnButton").addEventListener("click",()=>{
-    setMode("login");
-});
+$("returnButton").addEventListener("click",()=>setMode("login"));
 
-async function checkRecovery(){
-    if(!client) return;
-
+if(!client){
+    showMessage("Supabase client unavailable. Check the library and configuration.",true);
+}else{
     client.auth.onAuthStateChange((event)=>{
         if(event === "PASSWORD_RECOVERY"){
             recoveryMode = true;
             mode = "recovery";
 
-            document.getElementById("tabs").classList.add("hidden");
-            nameGroup.classList.add("hidden");
-            forgot.classList.add("hidden");
-            passwordGroup.classList.remove("hidden");
-            confirmGroup.classList.remove("hidden");
-            document.getElementById("backToLogin").classList.remove("hidden");
+            $("tabs").classList.add("hidden");
+            $("nameGroup").classList.add("hidden");
+            $("forgot").classList.add("hidden");
+            $("confirmGroup").classList.remove("hidden");
+            $("backToLogin").classList.remove("hidden");
 
-            document.getElementById("confirmPassword").autocomplete = "new-password";
-            heading.textContent = "Reset your password";
-            description.textContent = "Choose a new password for your NOVEX account.";
-            submitButton.textContent = "Update Password";
+            $("heading").textContent = "Reset your password";
+            $("description").textContent = "Choose a new password for your NOVEX account.";
+            $("submitButton").textContent = "Update Password";
+
             showMessage("Enter your new password below.");
         }
     });
-}
-
-if(!client){
-    showMessage("Supabase client unavailable. Check supabase-config.js and script loading.",true);
-}else{
-    checkRecovery();
 
     client.auth.getSession().then(({data,error})=>{
-        if(!error && data.session){
+        if(!error && data.session && !recoveryMode){
             location.href = "dashboard.html";
         }
     });
 }
 </script>
-
 </body>
 </html>
