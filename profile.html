@@ -355,10 +355,19 @@ function showMessage(text,error=false){
     message.style.display = "block";
 }
 
-function updateDisplay(name){
+function updateDisplay(name, avatarUrl = null){
     const safeName = name || "NOVEX User";
     displayName.textContent = safeName;
-    avatar.textContent = safeName.charAt(0).toUpperCase();
+
+    if (avatarUrl) {
+        const img = document.createElement("img");
+        img.src = avatarUrl;
+        img.alt = "Profile picture";
+        img.style.cssText = "width:100%;height:100%;object-fit:cover;border-radius:50%;";
+        avatar.replaceChildren(img);
+    } else {
+        avatar.textContent = safeName.charAt(0).toUpperCase();
+    }
 }
 
 async function loadProfile(){
