@@ -289,6 +289,65 @@ const chooseAvatarButton = document.getElementById("chooseAvatarButton");
 chooseAvatarButton.addEventListener("click", () => {
     avatarInput.click();
 });
+  avatarInput.addEventListener("change", async () => {
+    const file = avatarInput.files[0];
+
+    if (!file || !currentUser) return;
+
+    if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
+        showMessage("Please select a JPG, PNG or WebP image.", true);
+        return;
+    }
+
+    if (file.size > 2 * 1024 * 1024) {
+        showMessage("Image must be smaller than 2 MB.", true);
+        return;
+    }
+
+    chooseAvatarButton.disabled = true;
+    chooseAvatarButton.textContent = "Uploading...";
+
+    try {
+        const extension = file.type.split("/")[1];
+        const filePath = `${currentUser.id}/avatar.${extension}`;
+
+        const { error: uploadError } = await client.storage
+            .from("novex-avatars")
+            .upload(filePath, file, { upsert: true });
+
+        if (uploadError) throw uploadError;
+
+        const { data } = client.storage
+            .from("novex-avatars")
+            .getPublicUrl(filePath);
+
+        const avatarUrl = data.publicUrl + "?t=" + Date.now();
+
+        const { data: updated, error } = await client.auth.updateUser({
+            data: { avatar_url: avatarUrl }
+        });
+
+        if (error) throw error;
+
+        currentUser = updated.user;
+
+        const img = document.createElement("img");
+        img.src = avatarUrl;
+        img.alt = "Profile picture";
+        img.style.cssText = "width:100%;height:100%;object-fit:cover;border-radius:50%;";
+
+        avatar.replaceChildren(img);
+
+        showMessage("Profile picture updated successfully!");
+
+    } catch (error) {
+        showMessage(error.message, true);
+    }
+
+    chooseAvatarButton.disabled = false;
+    chooseAvatarButton.textContent = "📷 Change Profile Picture";
+    avatarInput.value = "";
+});
 
 function showMessage(text,error=false){
     message.textContent = text;
