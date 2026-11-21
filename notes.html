@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#070914">
 <title>Notes Workspace | NOVEX</title>
+
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{background:#070914;color:white;font-family:Arial,sans-serif;min-height:100vh}
@@ -21,19 +22,23 @@ h1 span{color:#00d9ff}
 .top{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:18px;flex-wrap:wrap}
 .top h2{font-size:18px}
 #status{font-size:12px;color:#00d9ff}
-input{width:100%;padding:15px;background:#080d1b;color:white;border:1px solid #343b5c;border-radius:9px;margin-bottom:14px;font-size:15px}
+input,select{width:100%;padding:15px;background:#080d1b;color:white;border:1px solid #343b5c;border-radius:9px;margin-bottom:14px;font-size:15px}
+select{cursor:pointer}
 textarea{width:100%;min-height:330px;padding:20px;background:#080d1b;color:white;border:1px solid #343b5c;border-radius:12px;resize:vertical;font:14px/1.8 Arial,sans-serif;outline:none}
-textarea:focus,input:focus{border-color:#00d9ff}
+textarea:focus,input:focus,select:focus{border-color:#00d9ff}
 .toolbar{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:17px}
 button{padding:14px 10px;border:1px solid #343b5c;border-radius:9px;background:#20264b;color:white;font-weight:bold;cursor:pointer}
 button.primary{background:linear-gradient(100deg,#7165ff,#168dff);border:0}
 button.danger{color:#ff8292}
 button:active{transform:scale(.98)}
+button:disabled{opacity:.5;cursor:wait}
 footer{text-align:center;padding:25px;color:#9299b5;border-top:1px solid #252943;font-size:12px}
-@media(min-width:600px){.toolbar{grid-template-columns:repeat(4,1fr)}}
+@media(min-width:600px){.toolbar{grid-template-columns:repeat(3,1fr)}}
 </style>
 </head>
+
 <body>
+
 <header>
 <a href="index.html" class="logo">NOVEX<span>.</span></a>
 <a href="tools.html" class="back">← Digital Tools</a>
@@ -46,88 +51,267 @@ footer{text-align:center;padding:25px;color:#9299b5;border-top:1px solid #252943
 </section>
 
 <main class="workspace">
+
 <div class="top">
 <h2>MY WRITING DESK</h2>
-<span id="status">Ready to write</span>
+<span id="status">Connecting to NOVEX Cloud...</span>
 </div>
 
+<select id="notesList" aria-label="Choose a saved note">
+<option value="">Loading your notes...</option>
+</select>
+
 <input id="noteTitle" type="text" placeholder="Enter your note title...">
+
 <textarea id="noteText" placeholder="Start writing your ideas here..."></textarea>
 
 <div class="toolbar">
-<button class="primary" onclick="saveNote()">SAVE NOTE</button>
+<button class="primary" id="saveButton" onclick="saveNote()">SAVE TO CLOUD</button>
+<button id="newButton" onclick="newNote()">NEW NOTE</button>
 <button onclick="copyNote()">COPY TEXT</button>
 <button onclick="downloadNote()">DOWNLOAD</button>
-<button class="danger" onclick="clearNote()">CLEAR</button>
+<button class="danger" id="clearButton" onclick="clearNote()">DELETE NOTE</button>
 </div>
+
 </main>
 
 <footer>NOVEX NOTES WORKSPACE · © 2026 NOVEX</footer>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="supabase-config.js"></script>
+
 <script>
-const titleInput=document.getElementById("noteTitle");
-const noteInput=document.getElementById("noteText");
-const statusText=document.getElementById("status");
+const client = window.supabaseClient;
 
-function showStatus(message){
- statusText.textContent=message;
+const titleInput = document.getElementById("noteTitle");
+const noteInput = document.getElementById("noteText");
+const statusText = document.getElementById("status");
+const notesList = document.getElementById("notesList");
+const saveButton = document.getElementById("saveButton");
+
+let currentUser = null;
+let currentNoteId = null;
+let savedNotes = [];
+
+function showStatus(message,error=false){
+    statusText.textContent = message;
+    statusText.style.color = error ? "#ff8292" : "#00d9ff";
 }
 
-function saveNote(){
- try{
-  localStorage.setItem("novex_note_title",titleInput.value);
-  localStorage.setItem("novex_note_text",noteInput.value);
-  showStatus("Note saved on this device ✓");
- }catch(error){
-  showStatus("Unable to save. Check browser storage.");
- }
+function setBusy(busy){
+    saveButton.disabled = busy;
+    document.getElementById("newButton").disabled = busy;
+    document.getElementById("clearButton").disabled = busy;
+    saveButton.textContent = busy ? "PLEASE WAIT..." : "SAVE TO CLOUD";
 }
 
-function loadNote(){
- try{
-  titleInput.value=localStorage.getItem("novex_note_title")||"";
-  noteInput.value=localStorage.getItem("novex_note_text")||"";
- }catch(error){
-  showStatus("Browser storage is unavailable.");
- }
+function renderNotes(selectedId){
+    notesList.innerHTML = "";
+
+    if(savedNotes.length === 0){
+        const option = document.createElement("option");
+        option.value = "";
+        option.textContent = "No saved notes yet";
+        notesList.appendChild(option);
+        return;
+    }
+
+    savedNotes.forEach(note=>{
+        const option = document.createElement("option");
+        option.value = note.id;
+        option.textContent = note.title || "Untitled Note";
+        notesList.appendChild(option);
+    });
+
+    notesList.value = selectedId || "";
 }
+
+function displayNote(note){
+    currentNoteId = note ? note.id : null;
+    titleInput.value = note ? note.title : "";
+    noteInput.value = note ? note.content : "";
+
+    renderNotes(currentNoteId);
+}
+
+async function loadNotes(){
+    if(!client){
+        showStatus("Supabase connection unavailable.",true);
+        return;
+    }
+
+    const {data,error} = await client.auth.getUser();
+
+    if(error || !data.user){
+        location.href = "auth.html";
+        return;
+    }
+
+    currentUser = data.user;
+
+    const {data:notes,error:notesError} = await client
+        .from("novex_notes")
+        .select("*")
+        .order("updated_at",{ascending:false});
+
+    if(notesError){
+        showStatus("Unable to load cloud notes: " + notesError.message,true);
+        return;
+    }
+
+    savedNotes = notes || [];
+
+    if(savedNotes.length > 0){
+        displayNote(savedNotes[0]);
+        showStatus(savedNotes.length + " cloud note(s) loaded ✓");
+    }else{
+        displayNote(null);
+        showStatus("Your cloud workspace is ready ✓");
+    }
+}
+
+async function saveNote(){
+    if(!currentUser || !client){
+        showStatus("Please log in again.",true);
+        return;
+    }
+
+    const title = titleInput.value.trim() || "Untitled Note";
+    const content = noteInput.value;
+
+    if(!content.trim() && !titleInput.value.trim()){
+        showStatus("Write something before saving.",true);
+        return;
+    }
+
+    setBusy(true);
+
+    try{
+        let result;
+
+        if(currentNoteId){
+            result = await client
+                .from("novex_notes")
+                .update({
+                    title,
+                    content,
+                    updated_at:new Date().toISOString()
+                })
+                .eq("id",currentNoteId)
+                .select()
+                .single();
+        }else{
+            result = await client
+                .from("novex_notes")
+                .insert({
+                    user_id:currentUser.id,
+                    title,
+                    content
+                })
+                .select()
+                .single();
+        }
+
+        if(result.error) throw result.error;
+
+        const savedNote = result.data;
+
+        const existingIndex = savedNotes.findIndex(note=>note.id === savedNote.id);
+
+        if(existingIndex >= 0){
+            savedNotes[existingIndex] = savedNote;
+        }else{
+            savedNotes.push(savedNote);
+        }
+
+        savedNotes.sort((a,b)=>new Date(b.updated_at)-new Date(a.updated_at));
+
+        displayNote(savedNote);
+        showStatus("Note saved securely to NOVEX Cloud ✓");
+
+    }catch(error){
+        showStatus("Save failed: " + error.message,true);
+    }
+
+    setBusy(false);
+}
+
+function newNote(){
+    displayNote(null);
+    titleInput.focus();
+    showStatus("New note ready. Save it to your cloud workspace.");
+}
+
+notesList.addEventListener("change",()=>{
+    const selected = savedNotes.find(note=>note.id === notesList.value);
+
+    if(selected){
+        displayNote(selected);
+        showStatus("Cloud note opened ✓");
+    }
+});
 
 async function copyNote(){
- if(!noteInput.value){
-  showStatus("Write something first.");
-  return;
- }
- try{
-  await navigator.clipboard.writeText(noteInput.value);
-  showStatus("Text copied successfully ✓");
- }catch(error){
-  noteInput.select();
-  showStatus("Text selected. Copy it manually.");
- }
+    if(!noteInput.value){
+        showStatus("Write something first.",true);
+        return;
+    }
+
+    try{
+        await navigator.clipboard.writeText(noteInput.value);
+        showStatus("Text copied successfully ✓");
+    }catch(error){
+        noteInput.select();
+        showStatus("Text selected. Copy it manually.");
+    }
 }
 
 function downloadNote(){
- const content=titleInput.value+"\n\n"+noteInput.value;
- const blob=new Blob([content],{type:"text/plain;charset=utf-8"});
- const url=URL.createObjectURL(blob);
- const link=document.createElement("a");
- link.href=url;
- link.download=(titleInput.value.trim()||"NOVEX-Note")+".txt";
- link.click();
- URL.revokeObjectURL(url);
- showStatus("Your download is ready ✓");
+    const content = titleInput.value + "\n\n" + noteInput.value;
+
+    const blob = new Blob([content],{type:"text/plain;charset=utf-8"});
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+
+    link.href = url;
+    link.download = (titleInput.value.trim() || "NOVEX-Note") + ".txt";
+
+    link.click();
+    URL.revokeObjectURL(url);
+
+    showStatus("Your download is ready ✓");
 }
 
-function clearNote(){
- if(!confirm("Clear this note? This will also remove the saved note."))return;
- titleInput.value="";
- noteInput.value="";
- localStorage.removeItem("novex_note_title");
- localStorage.removeItem("novex_note_text");
- showStatus("Workspace cleared.");
+async function clearNote(){
+    if(!currentNoteId){
+        titleInput.value = "";
+        noteInput.value = "";
+        showStatus("New note cleared.");
+        return;
+    }
+
+    if(!confirm("Delete this cloud note permanently?")) return;
+
+    setBusy(true);
+
+    const {error} = await client
+        .from("novex_notes")
+        .delete()
+        .eq("id",currentNoteId);
+
+    if(error){
+        showStatus("Delete failed: " + error.message,true);
+    }else{
+        savedNotes = savedNotes.filter(note=>note.id !== currentNoteId);
+        displayNote(savedNotes.length ? savedNotes[0] : null);
+        showStatus("Cloud note deleted successfully ✓");
+    }
+
+    setBusy(false);
 }
 
-loadNote();
+loadNotes();
 </script>
+
 </body>
 </html>
