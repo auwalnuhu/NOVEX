@@ -283,6 +283,12 @@ const saveButton = document.getElementById("saveButton");
 
 let originalName = "";
 let currentUser = null;
+  const avatarInput = document.getElementById("avatarInput");
+const chooseAvatarButton = document.getElementById("chooseAvatarButton");
+
+chooseAvatarButton.addEventListener("click", () => {
+    avatarInput.click();
+});
 
 function showMessage(text,error=false){
     message.textContent = text;
