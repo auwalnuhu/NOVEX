@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NOVEX | My Profile</title>
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+
+body{
+font-family:Arial,sans-serif;
+background:#080d1c;
+color:white;
+min-height:100vh;
+padding:20px;
+}
+
+.container{
+max-width:850px;
+margin:auto;
+}
+
+header{
+display:flex;
+justify-content:space-between;
+align-items:center;
+margin-bottom:35px;
+gap:12px;
+}
+
+.logo{
+font-size:27px;
+font-weight:900;
+color:#35d9ff;
+}
+
+.logo span{color:white}
+
+header a{
+color:#35d9ff;
+text-decoration:none;
+font-size:13px;
+}
+
+.card{
+background:#111a30;
+border:1px solid #263957;
+border-radius:18px;
+padding:25px;
+margin-bottom:20px;
+box-shadow:0 15px 45px #0005;
+}
+
+.hero{text-align:center;padding:35px 20px}
+
+.avatar{
+width:95px;
+height:95px;
+border-radius:50%;
+background:linear-gradient(135deg,#087eae,#6247d8);
+display:grid;
+place-items:center;
+font-size:38px;
+font-weight:bold;
+margin:0 auto 18px;
+border:3px solid #35d9ff;
+}
+
+h1{font-size:25px;margin-bottom:9px}
+.subtitle{color:#9baac1;font-size:13px}
+
+h2{font-size:19px;margin-bottom:20px}
+
+label{
+display:block;
+font-size:13px;
+color:#c5d0e0;
+margin:18px 0 8px;
+}
+
+input{
+width:100%;
+padding:14px;
+background:#080f20;
+border:1px solid #304363;
+border-radius:9px;
+color:white;
+outline:none;
+}
+
+input:focus{border-color:#35d9ff}
+
+input:disabled{
+opacity:.65;
+cursor:not-allowed;
+}
+
+button{
+padding:13px 18px;
+border:0;
+border-radius:9px;
+background:linear-gradient(90deg,#087eae,#6247d8);
+color:white;
+font-weight:bold;
+cursor:pointer;
+}
+
+button:disabled{opacity:.6}
+
+.actions{
+display:flex;
+gap:12px;
+flex-wrap:wrap;
+margin-top:23px;
+}
+
+.secondary{
+background:#1a2942;
+border:1px solid #304363;
+}
+
+.danger{
+background:#421d2b;
+border:1px solid #743346;
+}
+
+.message{
+display:none;
+margin-top:18px;
+padding:13px;
+border-radius:9px;
+font-size:13px;
+line-height:1.5;
+background:#142b46;
+color:#bfefff;
+overflow-wrap:anywhere;
+}
+
+.message.error{
+background:#421d2b;
+color:#ffb5c0;
+}
+
+.info{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:12px;
+margin-top:20px;
+}
+
+.info-box{
+background:#080f20;
+padding:16px;
+border-radius:10px;
+border:1px solid #263957;
+}
+
+.info-box small{
+display:block;
+color:#8292ac;
+margin-bottom:8px;
+}
+
+.info-box strong{
+font-size:13px;
+overflow-wrap:anywhere;
+}
+
+footer{
+text-align:center;
+color:#61718b;
+font-size:11px;
+margin-top:30px;
+}
+
+@media(max-width:500px){
+.info{grid-template-columns:1fr}
+.card{padding:20px}
+header{margin-bottom:25px}
+}
+</style>
+</head>
+
+<body>
+
+<main class="container">
+
+<header>
+<div class="logo">NOVEX<span>.</span></div>
+<a href="dashboard.html">← Back to Dashboard</a>
+</header>
+
+<section class="card hero">
+<div class="avatar" id="avatar">N</div>
+<h1 id="displayName">Loading profile...</h1>
+<p class="subtitle">NOVEX Member Profile</p>
+</section>
+
+<section class="card">
+
+<h2>Personal Information</h2>
+
+<form id="profileForm">
+
+<label for="fullName">Full Name</label>
+<input
+id="fullName"
+type="text"
+placeholder="Your full name"
+required
+>
+
+<label for="email">Email Address</label>
+<input
+id="email"
+type="email"
+disabled
+>
+
+<div class="actions">
+<button type="submit" id="saveButton">Save Changes</button>
+<button type="button" class="secondary" id="cancelButton">Cancel</button>
+</div>
+
+</form>
+
+<div class="message" id="message"></div>
+
+<div class="info">
+<div class="info-box">
+<small>Account Status</small>
+<strong id="accountStatus">Checking...</strong>
+</div>
+
+<div class="info-box">
+<small>Account Provider</small>
+<strong>Supabase Authentication</strong>
+</div>
+</div>
+
+</section>
+
+<section class="card">
+<h2>Account Security</h2>
+<p class="subtitle">Your NOVEX account is protected through Supabase authentication.</p>
+
+<div class="actions">
+<button class="danger" id="logoutButton">Logout</button>
+</div>
+</section>
+
+<footer>NOVEX · YOUR DIGITAL UNIVERSE · 2026</footer>
+
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="supabase-config.js"></script>
+
+<script>
+const client = window.supabaseClient;
+
+const fullName = document.getElementById("fullName");
+const email = document.getElementById("email");
+const displayName = document.getElementById("displayName");
+const avatar = document.getElementById("avatar");
+const message = document.getElementById("message");
+const saveButton = document.getElementById("saveButton");
+
+let originalName = "";
+let currentUser = null;
+
+function showMessage(text,error=false){
+    message.textContent = text;
+    message.className = "message" + (error ? " error" : "");
+    message.style.display = "block";
+}
+
+function updateDisplay(name){
+    const safeName = name || "NOVEX User";
+    displayName.textContent = safeName;
+    avatar.textContent = safeName.charAt(0).toUpperCase();
+}
+
+async function loadProfile(){
+    if(!client){
+        showMessage("Supabase connection unavailable.",true);
+        return;
+    }
+
+    const {data,error} = await client.auth.getUser();
+
+    if(error || !data.user){
+        location.href = "auth.html";
+        return;
+    }
+
+    currentUser = data.user;
+
+    originalName =
+        currentUser.user_metadata?.full_name ||
+        currentUser.email?.split("@")[0] ||
+        "NOVEX User";
+
+    fullName.value = originalName;
+    email.value = currentUser.email || "";
+
+    updateDisplay(originalName);
+
+    document.getElementById("accountStatus").textContent =
+        currentUser.email_confirmed_at ? "Verified" : "Pending verification";
+}
+
+document.getElementById("profileForm").addEventListener("submit",async event=>{
+    event.preventDefault();
+
+    if(!client || !currentUser) return;
+
+    const newName = fullName.value.trim();
+
+    if(!newName){
+        showMessage("Please enter your full name.",true);
+        return;
+    }
+
+    saveButton.disabled = true;
+    saveButton.textContent = "Saving...";
+
+    try{
+        const {data,error} = await client.auth.updateUser({
+            data:{full_name:newName}
+        });
+
+        if(error) throw error;
+
+        currentUser = data.user;
+        originalName = newName;
+
+        updateDisplay(newName);
+        showMessage("Your profile has been updated successfully!");
+
+    }catch(error){
+        showMessage(error.message,true);
+    }
+
+    saveButton.disabled = false;
+    saveButton.textContent = "Save Changes";
+});
+
+document.getElementById("cancelButton").addEventListener("click",()=>{
+    fullName.value = originalName;
+    updateDisplay(originalName);
+    message.style.display = "none";
+});
+
+document.getElementById("logoutButton").addEventListener("click",async()=>{
+    const {error} = await client.auth.signOut();
+
+    if(error){
+        showMessage(error.message,true);
+        return;
+    }
+
+    location.href = "auth.html";
+});
+
+loadProfile();
+</script>
+
+</body>
+</html>
