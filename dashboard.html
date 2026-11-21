@@ -52,6 +52,7 @@ a{color:inherit;text-decoration:none}
 .task-form input,.note-area{background:#080f20;color:white;border:1px solid #304363;border-radius:9px;padding:12px;outline:none;width:100%;min-width:0}
 .task-form input:focus,.note-area:focus{border-color:var(--cyan)}
 .primary{background:linear-gradient(90deg,#087eae,#6247d8);color:white;border:0;border-radius:9px;padding:12px 16px;font-weight:bold;cursor:pointer}
+.primary:disabled{opacity:.5;cursor:not-allowed}
 .task-list{list-style:none}
 .task-list li{display:flex;align-items:center;gap:10px;padding:12px 0;border-bottom:1px solid #25334b;font-size:13px}
 .task-list li span{flex:1;overflow-wrap:anywhere}
@@ -63,7 +64,6 @@ a{color:inherit;text-decoration:none}
 .search-box{width:100%;background:#111a30;border:1px solid var(--border);border-radius:11px;padding:14px 16px;color:white;outline:none;margin-bottom:5px}
 .search-box:focus{border-color:var(--cyan)}
 .footer{text-align:center;color:#61718b;font-size:12px;margin-top:35px}
-.mobile-menu{display:none}
 @media(max-width:1000px){.app-grid{grid-template-columns:repeat(3,1fr)}}
 @media(max-width:700px){
 .sidebar{width:72px;padding:20px 9px}
@@ -86,7 +86,6 @@ a{color:inherit;text-decoration:none}
 
 <aside class="sidebar">
 <div class="logo">N<span>OVEX</span>.</div>
-
 <div class="side-label">WORKSPACE</div>
 <nav class="nav">
 <a class="active" href="dashboard.html">⌂ <span class="nav-text">Dashboard</span></a>
@@ -95,13 +94,11 @@ a{color:inherit;text-decoration:none}
 <a href="tools.html">▦ <span class="nav-text">Applications</span></a>
 <a href="notes.html">▤ <span class="nav-text">Notes</span></a>
 </nav>
-
 <div class="side-label">DISCOVER</div>
 <nav class="nav">
 <a href="about.html">ⓘ <span class="nav-text">About NOVEX</span></a>
 <a href="contact.html">✉ <span class="nav-text">Contact</span></a>
 </nav>
-
 <div class="sidebar-bottom">NOVEX OS · 2026</div>
 </aside>
 
@@ -158,56 +155,26 @@ a{color:inherit;text-decoration:none}
 <input class="search-box" id="appSearch" placeholder="⌕ Search your applications...">
 
 <section class="app-grid" id="appGrid">
-<a class="app-card" href="ai.html" data-name="ai hub artificial intelligence">
-<div class="app-icon">🤖</div><h3>AI Hub</h3><p>Explore AI platforms.</p>
-</a>
-<a class="app-card" href="tools.html" data-name="digital tools applications">
-<div class="app-icon">🧰</div><h3>Digital Tools</h3><p>Your collection of utilities.</p>
-</a>
-<a class="app-card" href="notes.html" data-name="notes writing workspace">
-<div class="app-icon">📝</div><h3>Notes</h3><p>Write and save your ideas.</p>
-</a>
-<a class="app-card" href="calculator.html" data-name="calculator mathematics">
-<div class="app-icon">🧮</div><h3>Calculator</h3><p>Calculate with ease.</p>
-</a>
-<a class="app-card" href="qr-generator.html" data-name="qr code generator">
-<div class="app-icon">▦</div><h3>QR Generator</h3><p>Create QR codes.</p>
-</a>
-<a class="app-card" href="password-generator.html" data-name="password generator security">
-<div class="app-icon">🔐</div><h3>Password Generator</h3><p>Create secure passwords.</p>
-</a>
-<a class="app-card" href="image-compressor.html" data-name="image compressor photos">
-<div class="app-icon">🖼️</div><h3>Image Compressor</h3><p>Reduce image file sizes.</p>
-</a>
-<a class="app-card" href="unit-converter.html" data-name="unit converter measurements">
-<div class="app-icon">📐</div><h3>Unit Converter</h3><p>Convert measurements.</p>
-</a>
-<a class="app-card" href="currency-converter.html" data-name="currency converter money">
-<div class="app-icon">💱</div><h3>Currency Converter</h3><p>Convert global currencies.</p>
-</a>
-<a class="app-card" href="age-calculator.html" data-name="age calculator birthday">
-<div class="app-icon">🎂</div><h3>Age Calculator</h3><p>Calculate your exact age.</p>
-</a>
-<a class="app-card" href="stopwatch.html" data-name="stopwatch timer">
-<div class="app-icon">⏱️</div><h3>Stopwatch</h3><p>Track your time.</p>
-</a>
-<a class="app-card" href="qr-scanner.html" data-name="qr scanner scan">
-<div class="app-icon">📷</div><h3>QR Scanner</h3><p>Scan QR codes.</p>
-</a>
-<a class="app-card" href="text-tools.html" data-name="text tools utilities">
-<div class="app-icon">🔤</div><h3>Text Utilities</h3><p>Transform your text.</p>
-</a>
-<a class="app-card" href="qr-customizer.html" data-name="qr customizer design">
-<div class="app-icon">🎨</div><h3>QR Customizer</h3><p>Design colourful QR codes.</p>
-</a>
-<a class="app-card" href="contact.html" data-name="contact support">
-<div class="app-icon">✉️</div><h3>Support</h3><p>Get in touch with NOVEX.</p>
-</a>
+<a class="app-card" href="ai.html" data-name="ai hub artificial intelligence"><div class="app-icon">🤖</div><h3>AI Hub</h3><p>Explore AI platforms.</p></a>
+<a class="app-card" href="tools.html" data-name="digital tools applications"><div class="app-icon">🧰</div><h3>Digital Tools</h3><p>Your collection of utilities.</p></a>
+<a class="app-card" href="notes.html" data-name="notes writing workspace"><div class="app-icon">📝</div><h3>Notes</h3><p>Write and save your ideas.</p></a>
+<a class="app-card" href="calculator.html" data-name="calculator mathematics"><div class="app-icon">🧮</div><h3>Calculator</h3><p>Calculate with ease.</p></a>
+<a class="app-card" href="qr-generator.html" data-name="qr code generator"><div class="app-icon">▦</div><h3>QR Generator</h3><p>Create QR codes.</p></a>
+<a class="app-card" href="password-generator.html" data-name="password generator security"><div class="app-icon">🔐</div><h3>Password Generator</h3><p>Create secure passwords.</p></a>
+<a class="app-card" href="image-compressor.html" data-name="image compressor photos"><div class="app-icon">🖼️</div><h3>Image Compressor</h3><p>Reduce image file sizes.</p></a>
+<a class="app-card" href="unit-converter.html" data-name="unit converter measurements"><div class="app-icon">📐</div><h3>Unit Converter</h3><p>Convert measurements.</p></a>
+<a class="app-card" href="currency-converter.html" data-name="currency converter money"><div class="app-icon">💱</div><h3>Currency Converter</h3><p>Convert global currencies.</p></a>
+<a class="app-card" href="age-calculator.html" data-name="age calculator birthday"><div class="app-icon">🎂</div><h3>Age Calculator</h3><p>Calculate your exact age.</p></a>
+<a class="app-card" href="stopwatch.html" data-name="stopwatch timer"><div class="app-icon">⏱️</div><h3>Stopwatch</h3><p>Track your time.</p></a>
+<a class="app-card" href="qr-scanner.html" data-name="qr scanner scan"><div class="app-icon">📷</div><h3>QR Scanner</h3><p>Scan QR codes.</p></a>
+<a class="app-card" href="text-tools.html" data-name="text tools utilities"><div class="app-icon">🔤</div><h3>Text Utilities</h3><p>Transform your text.</p></a>
+<a class="app-card" href="qr-customizer.html" data-name="qr customizer design"><div class="app-icon">🎨</div><h3>QR Customizer</h3><p>Design colourful QR codes.</p></a>
+<a class="app-card" href="contact.html" data-name="contact support"><div class="app-icon">✉️</div><h3>Support</h3><p>Get in touch with NOVEX.</p></a>
 </section>
 
 <div class="section-heading">
 <h2>Personal Workspace</h2>
-<span>Your data stays in this browser</span>
+<span>Your tasks sync to the cloud</span>
 </div>
 
 <section class="workspace">
@@ -215,44 +182,56 @@ a{color:inherit;text-decoration:none}
 <h3>☑️ Task Manager</h3>
 <form class="task-form" id="taskForm">
 <input id="taskInput" placeholder="What needs to be done?" maxlength="120" required>
-<button class="primary" type="submit">Add</button>
+<button class="primary" id="addTaskButton" type="submit">Add</button>
 </form>
-<ul class="task-list" id="taskList"></ul>
+<ul class="task-list" id="taskList">
+<li style="color:#8494ad">Loading your cloud tasks...</li>
+</ul>
+<div class="note-status" id="taskStatus">Connecting to NOVEX Cloud...</div>
 </div>
 
 <div class="panel">
 <h3>📝 Quick Notes</h3>
 <textarea class="note-area" id="quickNote" placeholder="Write down an idea, reminder or thought..."></textarea>
-<div class="note-status" id="noteStatus">Your notes save automatically on this device.</div>
+<div class="note-status" id="noteStatus">Your quick notes save on this device.</div>
 </div>
 </section>
 
 <footer class="footer">NOVEX — YOUR DIGITAL UNIVERSE · 2026</footer>
 </main>
 </div>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script src="supabase-config.js"></script>
 
 <script>
-  const authClient = window.supabaseClient;
+const authClient = window.supabaseClient;
+let currentUser = null;
+let tasks = [];
+
+const taskList = document.getElementById("taskList");
+const taskStatus = document.getElementById("taskStatus");
+const taskInput = document.getElementById("taskInput");
+const addTaskButton = document.getElementById("addTaskButton");
 
 async function protectDashboard() {
     if (!authClient) {
         location.href = "auth.html";
-        return;
+        return false;
     }
 
     const { data, error } = await authClient.auth.getUser();
 
     if (error || !data.user) {
         location.href = "auth.html";
-        return;
+        return false;
     }
 
-    const user = data.user;
-    const name = user.user_metadata?.full_name ||
-                 user.email?.split("@")[0] ||
-                 "NOVEX User";
+    currentUser = data.user;
+
+    const name = currentUser.user_metadata?.full_name ||
+        currentUser.email?.split("@")[0] ||
+        "NOVEX User";
 
     document.getElementById("userProfile").textContent =
         name.charAt(0).toUpperCase();
@@ -270,112 +249,266 @@ async function protectDashboard() {
 
         location.href = "auth.html";
     });
+
+    return true;
 }
 
-protectDashboard();
-const clock=document.getElementById("clock");
-const today=document.getElementById("today");
+// Clock
+const clock = document.getElementById("clock");
+const today = document.getElementById("today");
 
-function updateClock(){
-const now=new Date();
-clock.textContent=now.toLocaleTimeString();
-today.textContent=now.toLocaleDateString(undefined,{
-weekday:"long",year:"numeric",month:"long",day:"numeric"
-});
+function updateClock() {
+    const now = new Date();
+    clock.textContent = now.toLocaleTimeString();
+    today.textContent = now.toLocaleDateString(undefined, {
+        weekday: "long",
+        year: "numeric",
+        month: "long",
+        day: "numeric"
+    });
 }
+
 updateClock();
-setInterval(updateClock,1000);
+setInterval(updateClock, 1000);
 
 // Application search
-document.getElementById("appSearch").addEventListener("input",function(){
-const query=this.value.toLowerCase();
-document.querySelectorAll(".app-card").forEach(card=>{
-card.style.display=card.dataset.name.includes(query)?"block":"none";
-});
+document.getElementById("appSearch").addEventListener("input", function() {
+    const query = this.value.toLowerCase();
+
+    document.querySelectorAll(".app-card").forEach(card => {
+        card.style.display = card.dataset.name.includes(query) ? "block" : "none";
+    });
 });
 
-// Tasks
-let tasks=[];
-try{tasks=JSON.parse(localStorage.getItem("novex_tasks")||"[]");}catch(e){tasks=[];}
+// Render cloud tasks
+function renderTasks() {
+    taskList.innerHTML = "";
+    let completed = 0;
 
-function saveTasks(){
-localStorage.setItem("novex_tasks",JSON.stringify(tasks));
-renderTasks();
+    tasks.forEach((task, index) => {
+        if (task.completed) completed++;
+
+        const li = document.createElement("li");
+        if (task.completed) li.classList.add("done");
+
+        const checkbox = document.createElement("input");
+        checkbox.type = "checkbox";
+        checkbox.checked = task.completed;
+        checkbox.disabled = true;
+
+        checkbox.addEventListener("change", async () => {
+            await toggleTask(index, checkbox.checked);
+        });
+
+        const text = document.createElement("span");
+        text.textContent = task.title;
+
+        const remove = document.createElement("button");
+        remove.className = "delete";
+        remove.textContent = "×";
+        remove.title = "Delete task";
+
+        remove.addEventListener("click", async () => {
+            await deleteTask(index);
+        });
+
+        li.append(checkbox, text, remove);
+        taskList.appendChild(li);
+
+        // Enable controls after the list is rendered
+        checkbox.disabled = false;
+    });
+
+    if (!tasks.length) {
+        const empty = document.createElement("li");
+        empty.textContent = "No tasks yet. Add your first task above.";
+        empty.style.color = "#8494ad";
+        taskList.appendChild(empty);
+    }
+
+    document.getElementById("taskCount").textContent = completed;
 }
 
-function renderTasks(){
-const list=document.getElementById("taskList");
-list.innerHTML="";
-let completed=0;
+// Load tasks from Supabase
+async function loadTasks() {
+    taskStatus.textContent = "Loading cloud tasks...";
 
-tasks.forEach((task,index)=>{
-if(task.done)completed++;
+    const { data, error } = await authClient
+        .from("novex_tasks")
+        .select("*")
+        .order("created_at", { ascending: true });
 
-const li=document.createElement("li");
-if(task.done)li.classList.add("done");
+    if (error) {
+        console.error("NOVEX task loading error:", error);
+        taskStatus.textContent = "Unable to load cloud tasks: " + error.message;
+        taskList.innerHTML = "";
+        const item = document.createElement("li");
+        item.textContent = "Cloud tasks could not be loaded.";
+        item.style.color = "#ff7384";
+        taskList.appendChild(item);
+        addTaskButton.disabled = true;
+        return;
+    }
 
-const checkbox=document.createElement("input");
-checkbox.type="checkbox";
-checkbox.checked=task.done;
-checkbox.addEventListener("change",()=>{
-tasks[index].done=checkbox.checked;
-saveTasks();
-});
+    // Migrate old local tasks only when the cloud is empty
+    if (data.length === 0) {
+        let oldTasks = [];
 
-const text=document.createElement("span");
-text.textContent=task.text;
+        try {
+            oldTasks = JSON.parse(localStorage.getItem("novex_tasks") || "[]");
+        } catch (e) {
+            oldTasks = [];
+        }
 
-const remove=document.createElement("button");
-remove.className="delete";
-remove.textContent="×";
-remove.title="Delete task";
-remove.addEventListener("click",()=>{
-tasks.splice(index,1);
-saveTasks();
-});
+        if (Array.isArray(oldTasks) && oldTasks.length > 0) {
+            const migration = oldTasks
+                .filter(task => task && typeof task.text === "string")
+                .map(task => ({
+                    user_id: currentUser.id,
+                    title: task.text,
+                    completed: Boolean(task.done)
+                }));
 
-li.append(checkbox,text,remove);
-list.appendChild(li);
-});
+            if (migration.length > 0) {
+                const { data: migrated, error: migrationError } = await authClient
+                    .from("novex_tasks")
+                    .insert(migration)
+                    .select();
 
-if(!tasks.length){
-const empty=document.createElement("li");
-empty.textContent="No tasks yet. Add your first task above.";
-empty.style.color="#8494ad";
-list.appendChild(empty);
+                if (migrationError) {
+                    console.error("Task migration error:", migrationError);
+                    taskStatus.textContent =
+                        "Cloud migration failed: " + migrationError.message;
+                    return;
+                }
+
+                // Remove the old copy only after successful cloud migration
+                localStorage.removeItem("novex_tasks");
+                tasks = migrated || [];
+                renderTasks();
+                taskStatus.textContent = "Your existing tasks were moved to NOVEX Cloud.";
+                return;
+            }
+        }
+    }
+
+    tasks = data || [];
+    renderTasks();
+    taskStatus.textContent = "☁️ Connected — your tasks are saved to NOVEX Cloud.";
+    addTaskButton.disabled = false;
 }
 
-document.getElementById("taskCount").textContent=completed;
-}
+// Add task
+document.getElementById("taskForm").addEventListener("submit", async function(e) {
+    e.preventDefault();
 
-document.getElementById("taskForm").addEventListener("submit",function(e){
-e.preventDefault();
-const input=document.getElementById("taskInput");
-const value=input.value.trim();
-if(!value)return;
-tasks.push({text:value,done:false});
-input.value="";
-saveTasks();
+    const value = taskInput.value.trim();
+    if (!value || !currentUser) return;
+
+    addTaskButton.disabled = true;
+    taskStatus.textContent = "Saving task to cloud...";
+
+    const { data, error } = await authClient
+        .from("novex_tasks")
+        .insert({
+            user_id: currentUser.id,
+            title: value,
+            completed: false
+        })
+        .select()
+        .single();
+
+    if (error) {
+        console.error("Task save error:", error);
+        taskStatus.textContent = "Could not save task: " + error.message;
+        addTaskButton.disabled = false;
+        return;
+    }
+
+    tasks.push(data);
+    taskInput.value = "";
+    renderTasks();
+    taskStatus.textContent = "☁️ Task saved to cloud.";
+    addTaskButton.disabled = false;
 });
 
-renderTasks();
+// Complete or uncomplete task
+async function toggleTask(index, checked) {
+    const task = tasks[index];
+    if (!task) return;
 
-// Quick notes
-const quickNote=document.getElementById("quickNote");
-const noteStatus=document.getElementById("noteStatus");
+    taskStatus.textContent = "Updating task...";
 
-quickNote.value=localStorage.getItem("novex_quick_note")||"";
+    const { data, error } = await authClient
+        .from("novex_tasks")
+        .update({ completed: checked })
+        .eq("id", task.id)
+        .select()
+        .single();
 
-function updateNoteCount(){
-document.getElementById("noteCount").textContent=quickNote.value.length;
+    if (error) {
+        console.error("Task update error:", error);
+        taskStatus.textContent = "Could not update task: " + error.message;
+        renderTasks();
+        return;
+    }
+
+    tasks[index] = data;
+    renderTasks();
+    taskStatus.textContent = "☁️ Task updated in cloud.";
 }
+
+// Delete task
+async function deleteTask(index) {
+    const task = tasks[index];
+    if (!task) return;
+
+    taskStatus.textContent = "Deleting task...";
+
+    const { error } = await authClient
+        .from("novex_tasks")
+        .delete()
+        .eq("id", task.id);
+
+    if (error) {
+        console.error("Task deletion error:", error);
+        taskStatus.textContent = "Could not delete task: " + error.message;
+        return;
+    }
+
+    tasks.splice(index, 1);
+    renderTasks();
+    taskStatus.textContent = "☁️ Task deleted from cloud.";
+}
+
+// Quick notes remain local for now
+const quickNote = document.getElementById("quickNote");
+const noteStatus = document.getElementById("noteStatus");
+
+quickNote.value = localStorage.getItem("novex_quick_note") || "";
+
+function updateNoteCount() {
+    document.getElementById("noteCount").textContent = quickNote.value.length;
+}
+
 updateNoteCount();
 
-quickNote.addEventListener("input",()=>{
-localStorage.setItem("novex_quick_note",quickNote.value);
-noteStatus.textContent="Saved on this device.";
-updateNoteCount();
+quickNote.addEventListener("input", () => {
+    localStorage.setItem("novex_quick_note", quickNote.value);
+    noteStatus.textContent = "Saved on this device.";
+    updateNoteCount();
 });
+
+// Start dashboard after authentication
+async function startDashboard() {
+    const authenticated = await protectDashboard();
+
+    if (!authenticated) return;
+
+    await loadTasks();
+}
+
+startDashboard();
 </script>
 </body>
 </html>
