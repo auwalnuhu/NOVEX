@@ -393,7 +393,7 @@ async function loadProfile(){
     fullName.value = originalName;
     email.value = currentUser.email || "";
 
-    updateDisplay(originalName);
+    updateDisplay(originalName, currentUser.user_metadata?.avatar_url);
 
     document.getElementById("accountStatus").textContent =
         currentUser.email_confirmed_at ? "Verified" : "Pending verification";
