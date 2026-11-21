@@ -582,6 +582,7 @@ async function startDashboard() {
     if (!authenticated) return;
 
     await loadTasks();
+    await loadQuickNote();
 }
 
 startDashboard();
